@@ -128,7 +128,12 @@ public class ExtremeShapelessOreRecipe implements IRecipe
 
                     if (next instanceof ItemStack)
                     {
-                        match = OreDictionary.itemMatches((ItemStack)next, slot, false);
+                        ItemStack targetStack = (ItemStack) next;
+                        match = OreDictionary.itemMatches(targetStack, slot, false);
+                        if (targetStack.hasTagCompound() && !ItemStack.areItemStackTagsEqual(targetStack, slot))
+                        {
+                            match = false;
+                        }
                     }
                     else if (next instanceof List)
                     {

@@ -225,7 +225,13 @@ public class ExtremeShapedOreRecipe implements IRecipe {
 
                 if (target instanceof ItemStack)
                 {
-                    if (!OreDictionary.itemMatches((ItemStack)target, slot, false))
+                    ItemStack targetStack = (ItemStack) target;
+                    if (!OreDictionary.itemMatches(targetStack, slot, false))
+                    {
+                        return false;
+                    }
+
+                    if (targetStack.hasTagCompound() && !ItemStack.areItemStackTagsEqual(targetStack, slot))
                     {
                         return false;
                     }
