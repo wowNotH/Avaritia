@@ -70,6 +70,7 @@ public class TileEntityDireCrafting extends TileLudicrous implements IInventory,
 
     @Override
     public ItemStack decrStackSize(int slot, int decrement){
+        markDirty();
 
         if(slot == 0){
             if(result != null){
@@ -117,6 +118,7 @@ public class TileEntityDireCrafting extends TileLudicrous implements IInventory,
 
                 ItemStack craft = result;
                 result = null;
+                markDirty();
                 return craft;
 
             }
@@ -127,6 +129,7 @@ public class TileEntityDireCrafting extends TileLudicrous implements IInventory,
             if(matrix[slot - 1] != null){
                 ItemStack ingredient = matrix[slot - 1];
                 matrix[slot - 1] = null;
+                markDirty();
                 return ingredient;
             }
         }
@@ -163,6 +166,7 @@ public class TileEntityDireCrafting extends TileLudicrous implements IInventory,
         else if(slot <= matrix.length){
             matrix[slot - 1] = stack;
         }
+        markDirty();
     }
 
     @Override
