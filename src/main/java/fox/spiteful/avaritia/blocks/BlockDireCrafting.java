@@ -62,7 +62,7 @@ public class BlockDireCrafting extends BlockContainer {
         TileEntity tile = worldIn.getTileEntity(pos);
 
         if (tile instanceof TileEntityDireCrafting) {
-            for (int i = 0; i < ((TileEntityDireCrafting) tile).getSizeInventory(); i++) {
+            for (int i = 1; i < ((TileEntityDireCrafting) tile).getSizeInventory(); i++) {
                 ItemStack stack = ((TileEntityDireCrafting) tile).getStackInSlot(i);
                 if (stack != null) {
                     EntityItem item = new EntityItem(worldIn, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
