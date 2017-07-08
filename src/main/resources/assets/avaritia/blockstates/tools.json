@@ -62,6 +62,12 @@
 				"textures": {
 					"layer0": "items/tools/skull_sword/layer_0"
 				}
+			},
+			"infinity_hoe": {
+				"transform": "ccl:default-tool",
+				"textures": {
+					"layer0": "items/tools/infinity_hoe/layer_0"
+				}
 			}
 		},
 		"armor": {

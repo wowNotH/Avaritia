@@ -6,196 +6,88 @@ buildscript {
             name = "forge"
             url = "http://files.minecraftforge.net/maven"
         }
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
     }
     dependencies {
         classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
     }
 }
+
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'maven'
-
-
-
-
-group = "morph.avaritia" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+group = "morph.avaritia"
 archivesBaseName = "Avaritia"
 
-// Define properties file
-ext.configFile = file "build.properties"
-
-configFile.withReader {
-    // Load config.  It shall from now be referenced as simply config or project.config
-    def prop = new Properties()
-    prop.load(it)
-    project.ext.config = new ConfigSlurper().parse prop
+sourceCompatibility = targetCompatibility = "1.8"
+version = "${mc_version}-${mod_version}"
+minecraft {
+    version = mc_version + "-" + forge_version
+    mappings = mcp_mappings
+    runDir = "run"
+    makeObfSourceJar = false
 }
 
 repositories {
-    maven {
-        name = "ModMaven"
-        url = "https://modmaven.k-4u.nl/"     
-    }
+	maven {
+		name = "tterrag"
+		url = "http://maven.tterrag.com"
+	}
     maven {
         name = "JEI"
         url = "http://dvs1.progwml6.com/files/maven"
         }
     maven {
-        name = "CB Maven"
-        url = "http://chickenbones.net/maven/"
+        name 'CB Maven'
+        url "http://chickenbones.net/maven/"
     }
     maven {
-        name = "OC Maven"
-        url = "http://maven.cil.li/"
+        name 'OC Maven'
+        url "http://maven.cil.li/"
     }
-    maven {
-		name = "ic2-and-forestry"
-		url = "http://maven.ic2.player.to/"
-	}
+     maven {
+        name 'Forestry'
+        url "http://maven.ic2.player.to"
+    }
+	maven {
+        name 'Jared'
+        url 'http://blamejared.com/maven'
+    }
+	maven {
+		name 'McJtyLib'
+        url "http://maven.k-4u.nl"
+    }
 }
 
 dependencies {
-    /*HARD DEPENDENCIES*/
-    compile "codechicken:CodeChickenLib:${config.mc_version}-${config.ccl_version}:deobf"
-
-    /*SOFT DEPENDENCIES*/
-    compile "mezz.jei:jei_${config.mc_version}:${config.jei_version}"
-    //compile "com.wayoftime.bloodmagic:BloodMagic:${config.mc_version}-${config.blood_magic_version}"
-    compile "slimeknights:TConstruct:${config.mc_version}-${config.tinkers_version}"
-    compile "slimeknights.mantle:Mantle:${config.mc_version}-${config.mantle_version}"
-    compile "mcjty.theoneprobe:TheOneProbe:1.1x-${config.top_version}"
-    compile "net.sengir.forestry:forestry_${config.mc_version}:${config.forestry_version}"
-    compile "MineTweaker3:MineTweaker3-API:${config.minetweaker_version}"
-    //compile "com.brandon3055.draconicevolution:Draconic-Evolution:${config.mc_version}-${config.de_version}:deobf"
-}
-
-targetCompatibility = "1.8"
-sourceCompatibility = "1.8"
-
-version = "${project.config.mod_version}." //+ (System.getenv("BUILD_NUMBER") ?: "1")
-
-println config.mc_version + "-" + config.forge_version
-// Setup the forge minecraft plugin data. Specify the preferred forge/minecraft version here
-minecraft {
-    version = config.mc_version + "-" + config.forge_version
-    mappings = config.mappings
-    runDir = "run"
-    makeObfSourceJar = false
+    compile "codechicken:CodeChickenLib:${mc_version}-${ccl_version}:deobf"
+    deobfCompile "mezz.jei:jei_${mc_version}:+"
+    //deobfCompile "com.wayoftime.bloodmagic:BloodMagic:${mc_version}-${blood_magic_version}"
+    deobfCompile "slimeknights:TConstruct:${mc_version}-${tinkers_version}"
+    deobfCompile "slimeknights.mantle:Mantle:${mc_version}-${mantle_version}"
+    deobfCompile "mcjty.theoneprobe:TheOneProbe:1.1x-${top_version}"
+	deobfCompile "com.github.mcjty:compatlayer:${mc_version}-${compatlayer_version}"
+    //deobfCompile "net.sengir.forestry:forestry_${mc_version}:${forestry_version}"
+    deobfCompile "MineTweaker3:MineTweaker3-API:${minetweaker_version}"
+    //compile "com.brandon3055.draconicevolution:Draconic-Evolution:${mc_version}-${de_version}:deobf"
 }
 
 processResources {
     inputs.property "version", project.version
-    inputs.property "mc_version", project.config.mc_version
+    inputs.property "mc_version", mc_version
 
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
-        expand 'version': project.version, 'mc_version': project.config.mc_version
+        expand 'version': project.version, 'mc_version': mc_version
     }
     rename '(.+_at.cfg)', 'META-INF/$1'
 }
 
-version = "${project.minecraft.version}-${project.version}"
-def commonManifest = {
-    attributes 'FMLAT': 'avaritia_at.cfg'
-}
-
 jar {
-    classifier = 'universal'
-    manifest commonManifest
-}
-
-task deobfJar(type: Jar) {
-    from sourceSets.main.output
-    classifier = 'deobf'
-    manifest commonManifest
-}
-
-task srcJar(type: Jar) {
-    from sourceSets.main.allSource
-    classifier = 'sources'
-    manifest commonManifest
-}
-
-// Tell the artifact system about our extra jars
-artifacts {
-    archives deobfJar
-    archives srcJar
-}
-
-// Configure an upload task.
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            if (project.hasProperty("local_maven")) {
-                repository(url: "file://${local_maven}")
-                pom {
-                    groupId = project.group
-                    // Force the maven upload to use the <mcversion>-<version> syntax preferred at files
-                    artifactId = project.archivesBaseName
-                    project {
-                        name project.archivesBaseName
-                        packaging 'jar'
-                        description 'Avaritia'
-                        url 'https://github.com/Morpheus1101/Avaritia'
-
-                        scm {
-                            url 'https://github.com/Morpheus1101/Avaritia'
-                            connection 'scm:git:git://github.com/Morpheus1101/Avaritia.git'
-                            developerConnection 'scm:git:git@github.com:Morpheus1101/Avaritia.git'
-                        }
-
-                        issueManagement {
-                            system 'github'
-                            url 'https://github.com/Morpheus1101/Avaritia/issues'
-                        }
-
-                        licenses {
-                            license {
-                                name 'MIT'
-                                url 'https://opensource.org/licenses/MIT'
-                                distribution 'repo'
-                            }
-                        }
-
-                        developers {
-                            developer {
-                                id 'Morpheus1101'
-                                name 'Morpheus1101'
-                                roles {
-                                    role 'developer'
-                                }
-                            }
-                            developer {
-                                id 'covers1624'
-                                name 'covers1624'
-                                roles {
-                                    role 'developer'
-                                }
-                            }
-                            developer {
-                                id 'brandon3055'
-                                name 'brandon3055'
-                                roles {
-                                    role 'developer'
-                                }
-                            }
-                            developer {
-                                id 'SpitefulFox'
-                                name 'SpitefulFox'
-                                roles {
-                                    role 'Retired-Developer'
-                                }
-                            }
-                            developer {
-                                id 'TTFTCUTS'
-                                name 'TTFTCUTS'
-                                roles {
-                                    role 'Retired-Developer'
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+	classifier = 'universal'
+	manifest {
+        attributes 'FMLAT': 'avaritia_at.cfg'
     }
 }

@@ -19,17 +19,18 @@ import net.minecraftforge.oredict.ShapelessOreRecipe;
  */
 public class Recipes {
 
-    public static ExtremeShapelessOreRecipe catalyst;
+	public static ExtremeShapelessOreRecipe catalyst;
 
-    public static void init() {
-        OreDictionary.registerOre("blockCrystalMatrix", new ItemStack(ModBlocks.resource, 1, 2));
-        OreDictionary.registerOre("blockCosmicNeutronium", new ItemStack(ModBlocks.resource, 1, 0));
-        OreDictionary.registerOre("blockInfinity", new ItemStack(ModBlocks.resource, 1, 1));
-        OreDictionary.registerOre("ingotCrystalMatrix", ModItems.crystal_matrix_ingot);
-        OreDictionary.registerOre("ingotCosmicNeutronium", ModItems.neutronium_ingot);
-        OreDictionary.registerOre("ingotInfinity", ModItems.infinity_ingot);
+	public static void init() {
+		OreDictionary.registerOre("blockCrystalMatrix", new ItemStack(ModBlocks.resource, 1, 2));
+		OreDictionary.registerOre("blockCosmicNeutronium", new ItemStack(ModBlocks.resource, 1, 0));
+		OreDictionary.registerOre("blockInfinity", new ItemStack(ModBlocks.resource, 1, 1));
 
-        //@formatter:off
+		//OreDictionary.registerOre("ingotCrystalMatrix", ModItems.crystal_matrix_ingot);
+		//OreDictionary.registerOre("ingotCosmicNeutronium", ModItems.neutronium_ingot);
+		//OreDictionary.registerOre("ingotInfinity", ModItems.infinity_ingot);
+
+		//@formatter:off
         GameRegistry.addShapedRecipe(
                 ModItems.diamond_lattice,
                 "X X",
@@ -354,6 +355,7 @@ public class Recipes {
         CompressorManager.addRecipe(ModItems.redstoneSingularity, 500, new ItemStack(Blocks.REDSTONE_BLOCK, 1));
         CompressorManager.addRecipe(ModItems.diamondSingularity, 300, new ItemStack(Blocks.DIAMOND_BLOCK, 1));
         CompressorManager.addRecipe(ModItems.emeraldSingularity, 200, new ItemStack(Blocks.EMERALD_BLOCK, 1));
+        CompressorManager.addOreRecipe(ModItems.quartzSingularity, 200, "blockQuartz");
 
         if (ConfigHandler.endStone) {
             ExtremeCraftingManager.getInstance().addExtremeShapedOreRecipe(
@@ -409,65 +411,65 @@ public class Recipes {
                 'O', new ItemStack(ModBlocks.resource, 1, 0)
         );
         //@formatter:on
-    }
+	}
 
-    public static void initRecipeCompat() {
-        //if (Compat.mfr) {
-        //    catalyst.getInput().add(OreDictionary.getOres("record"));
-        //} else {
-        catalyst.getInput().add(ModItems.record_fragment);
-        IRecipe smashysmashy;
-        //if (Compat.botan) {
-        //	smashysmashy = new ShapelessOreRecipe(new ItemStack(LudicrousItems.resource, 4, 7), "record");
-        //} else {
-        smashysmashy = new ShapelessOreRecipe(ItemUtils.copyStack(ModItems.record_fragment, 8), "record");
-        //}
-        GameRegistry.addRecipe(smashysmashy);
-        //}
+	public static void initRecipeCompat() {
+		//if (Compat.mfr) {
+		//    catalyst.getInput().add(OreDictionary.getOres("record"));
+		//} else {
+		catalyst.getInput().add(ModItems.record_fragment);
+		IRecipe smashysmashy;
+		//if (Compat.botan) {
+		//	smashysmashy = new ShapelessOreRecipe(new ItemStack(LudicrousItems.resource, 4, 7), "record");
+		//} else {
+		smashysmashy = new ShapelessOreRecipe(ItemUtils.copyStack(ModItems.record_fragment, 8), "record");
+		//}
+		GameRegistry.addRecipe(smashysmashy);
+		//}
 
-        if (ConfigHandler.copper && !OreDictionary.getOres("blockCopper").isEmpty()) {
-            CompressorManager.addOreRecipe(ModItems.copperSingularity, 400, "blockCopper");
-            catalyst.getInput().add(ModItems.copperSingularity);
-        }
-        if (ConfigHandler.tin && !OreDictionary.getOres("blockTin").isEmpty()) {
-            CompressorManager.addOreRecipe(ModItems.tinSingularity, 400, "blockTin");
-            catalyst.getInput().add(ModItems.tinSingularity);
-        }
-        if (ConfigHandler.lead && !OreDictionary.getOres("blockLead").isEmpty()) {
-            CompressorManager.addOreRecipe(ModItems.leadSingularity, 300, "blockLead");
-            catalyst.getInput().add(ModItems.leadSingularity);
-        }
-        if (ConfigHandler.silver && !OreDictionary.getOres("blockSilver").isEmpty()) {
-            CompressorManager.addOreRecipe(ModItems.silverSingularity, 300, "blockSilver");
-            catalyst.getInput().add(ModItems.silverSingularity);
-        }
-        if (ConfigHandler.nickel && !OreDictionary.getOres("blockNickel").isEmpty()) {
-            CompressorManager.addOreRecipe(ModItems.nickelSingularity, 400, "blockNickel");
-            catalyst.getInput().add(ModItems.nickelSingularity);
-        }
-        //if (ConfigHandler.diamond && !OreDictionary.getOres("blockDiamond").isEmpty()) {
-        //    CompressorManager.addOreRecipe(ModItems.diamondSingularity, 200, "blockDiamond");
-        //    catalyst.getInput().add(ModItems.diamondSingularity);
-        //}
-        //if (ConfigHandler.emerald && !OreDictionary.getOres("blockEmerald").isEmpty()) {
-        //    CompressorManager.addOreRecipe(ModItems.emeraldSingularity, 400, "blockEmerald");
-        //    catalyst.getInput().add(ModItems.emeraldSingularity);
-        //}
-        //if (ConfigHandler.te && !OreDictionary.getOres("blockEnderium").isEmpty()) {
-        //    catalyst.getInput().add(OreDictionary.getOres("blockEnderium"));
-        //}
-        //if (ConfigHandler.steel && !OreDictionary.getOres("blockSteel").isEmpty()) {
-        //    catalyst.getInput().add(OreDictionary.getOres("blockSteel"));
-        //}
-        //if (ConfigHandler.metallurgy && !OreDictionary.getOres("ingotTartarite").isEmpty()) {
-        //    catalyst.getInput().add(OreDictionary.getOres("ingotTartarite"));
-        //}
-        //if (ConfigHandler.numanuma && !OreDictionary.getOres("blockIronCompressed").isEmpty()) {
-        //    catalyst.getInput().add(OreDictionary.getOres("blockIronCompressed"));
-        //}
-        //if (ConfigHandler.enderio && !OreDictionary.getOres("blockDarkSteel").isEmpty()) {
-        //    catalyst.getInput().add(OreDictionary.getOres("blockDarkSteel"));
-        //}
-    }
+		if (ConfigHandler.copper && !OreDictionary.getOres("blockCopper").isEmpty()) {
+			CompressorManager.addOreRecipe(ModItems.copperSingularity, 400, "blockCopper");
+			catalyst.getInput().add(ModItems.copperSingularity);
+		}
+		if (ConfigHandler.tin && !OreDictionary.getOres("blockTin").isEmpty()) {
+			CompressorManager.addOreRecipe(ModItems.tinSingularity, 400, "blockTin");
+			catalyst.getInput().add(ModItems.tinSingularity);
+		}
+		if (ConfigHandler.lead && !OreDictionary.getOres("blockLead").isEmpty()) {
+			CompressorManager.addOreRecipe(ModItems.leadSingularity, 300, "blockLead");
+			catalyst.getInput().add(ModItems.leadSingularity);
+		}
+		if (ConfigHandler.silver && !OreDictionary.getOres("blockSilver").isEmpty()) {
+			CompressorManager.addOreRecipe(ModItems.silverSingularity, 300, "blockSilver");
+			catalyst.getInput().add(ModItems.silverSingularity);
+		}
+		if (ConfigHandler.nickel && !OreDictionary.getOres("blockNickel").isEmpty()) {
+			CompressorManager.addOreRecipe(ModItems.nickelSingularity, 400, "blockNickel");
+			catalyst.getInput().add(ModItems.nickelSingularity);
+		}
+		//if (ConfigHandler.diamond && !OreDictionary.getOres("blockDiamond").isEmpty()) {
+		//    CompressorManager.addOreRecipe(ModItems.diamondSingularity, 200, "blockDiamond");
+		//    catalyst.getInput().add(ModItems.diamondSingularity);
+		//}
+		//if (ConfigHandler.emerald && !OreDictionary.getOres("blockEmerald").isEmpty()) {
+		//    CompressorManager.addOreRecipe(ModItems.emeraldSingularity, 400, "blockEmerald");
+		//    catalyst.getInput().add(ModItems.emeraldSingularity);
+		//}
+		//if (ConfigHandler.te && !OreDictionary.getOres("blockEnderium").isEmpty()) {
+		//    catalyst.getInput().add(OreDictionary.getOres("blockEnderium"));
+		//}
+		//if (ConfigHandler.steel && !OreDictionary.getOres("blockSteel").isEmpty()) {
+		//    catalyst.getInput().add(OreDictionary.getOres("blockSteel"));
+		//}
+		//if (ConfigHandler.metallurgy && !OreDictionary.getOres("ingotTartarite").isEmpty()) {
+		//    catalyst.getInput().add(OreDictionary.getOres("ingotTartarite"));
+		//}
+		//if (ConfigHandler.numanuma && !OreDictionary.getOres("blockIronCompressed").isEmpty()) {
+		//    catalyst.getInput().add(OreDictionary.getOres("blockIronCompressed"));
+		//}
+		//if (ConfigHandler.enderio && !OreDictionary.getOres("blockDarkSteel").isEmpty()) {
+		//    catalyst.getInput().add(OreDictionary.getOres("blockDarkSteel"));
+		//}
+	}
 
 }

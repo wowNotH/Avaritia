@@ -36,25 +36,25 @@ public class GUINeutroniumCompressor extends GuiMachineBase<TileNeutroniumCompre
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         String s = I18n.format("container.neutronium_compressor");
-        fontRendererObj.drawString(s, xSize / 2 - fontRendererObj.getStringWidth(s) / 2, 6, 0x404040);
-        fontRendererObj.drawString(I18n.format("container.inventory"), 8, ySize - 96 + 2, 0x404040);
+        fontRenderer.drawString(s, xSize / 2 - fontRenderer.getStringWidth(s) / 2, 6, 0x404040);
+        fontRenderer.drawString(I18n.format("container.inventory"), 8, ySize - 96 + 2, 0x404040);
         if (machineTile.getCompressionProgress() > 0) {
             s = machineTile.getCompressionProgress() + " / " + machineTile.getCompressionTarget();
-            int x = xSize / 2 - fontRendererObj.getStringWidth(s) / 2;
-            fontRendererObj.drawString(s, x, 60, 0x404040);
+            int x = xSize / 2 - fontRenderer.getStringWidth(s) / 2;
+            fontRenderer.drawString(s, x, 60, 0x404040);
         }
         if (machineTile.getTargetStack() != null) {
             s = "Output";
-            int x = (xSize + 147 - 8) / 2 - fontRendererObj.getStringWidth(s) / 2;
-            fontRendererObj.drawString(s, x, 25, 0x404040);
+            int x = (xSize + 147 - 8) / 2 - fontRenderer.getStringWidth(s) / 2;
+            fontRenderer.drawString(s, x, 25, 0x404040);
         }
         if (machineTile.getTargetStack() != null) {
             s = "Input";
             if (machineTile.getInputItems() != null && machineTile.getInputItems().size() > 1) {
                 s += "s";
             }
-            int x = (20 - fontRendererObj.getStringWidth(s) / 2);
-            fontRendererObj.drawString(s, x, 25, 0x404040);
+            int x = (20 - fontRenderer.getStringWidth(s) / 2);
+            fontRenderer.drawString(s, x, 25, 0x404040);
         }
 
         super.drawGuiContainerForegroundLayer(mouseX, mouseY);

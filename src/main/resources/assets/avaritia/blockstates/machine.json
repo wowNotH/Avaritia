@@ -24,6 +24,9 @@
 				"variants": {
 					"active": {
 						"true": {
+							"textures": {
+								"front": "blocks/machine/compressor/front_active"
+							}
 						},
 						"false": {
 						}

@@ -27,9 +27,9 @@ public class GUINeutronCollector extends GuiMachineBase<TileNeutronCollector, Co
         float scaled_progress = scaleF(machineTile.getProgress(), TileNeutronCollector.PRODUCTION_TICKS, 100);
         String progress = "Progress: " + MathHelper.round(scaled_progress, 10) + "%";
 
-        this.fontRendererObj.drawString(s, this.xSize / 2 - this.fontRendererObj.getStringWidth(s) / 2, 6, 0x404040);
-        this.fontRendererObj.drawString(progress, xSize / 2 - fontRendererObj.getStringWidth(progress) / 2, 60, 0x404040);
-        this.fontRendererObj.drawString(I18n.format("container.inventory"), 8, this.ySize - 96 + 2, 0x404040);
+        this.fontRenderer.drawString(s, this.xSize / 2 - this.fontRenderer.getStringWidth(s) / 2, 6, 0x404040);
+        this.fontRenderer.drawString(progress, xSize / 2 - fontRenderer.getStringWidth(progress) / 2, 60, 0x404040);
+        this.fontRenderer.drawString(I18n.format("container.inventory"), 8, this.ySize - 96 + 2, 0x404040);
     }
 
     @Override

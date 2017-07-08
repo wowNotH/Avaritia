@@ -1,5 +1,7 @@
 package morph.avaritia.block;
 
+import java.util.Random;
+
 import codechicken.lib.util.ItemUtils;
 import codechicken.lib.util.RotationUtils;
 import morph.avaritia.Avaritia;
@@ -31,94 +33,135 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockNeutroniumCompressor extends BlockContainer implements IModelRegister {
 
-    public BlockNeutroniumCompressor() {
-        super(Material.IRON);
-        setSoundType(SoundType.METAL);
-        setHardness(20);
-        setUnlocalizedName("avaritia:neutronium_compressor");
-        setRegistryName("neutronium_compressor");
-        setHarvestLevel("pickaxe", 3);
-        setCreativeTab(Avaritia.tab);
-        setDefaultState(getDefaultState().withProperty(AvaritiaProps.HORIZONTAL_FACING, EnumFacing.NORTH).withProperty(AvaritiaProps.ACTIVE, false));
-    }
+	public BlockNeutroniumCompressor() {
+		super(Material.IRON);
+		setSoundType(SoundType.METAL);
+		setHardness(20);
+		setUnlocalizedName("avaritia:neutronium_compressor");
+		setRegistryName("neutronium_compressor");
+		setHarvestLevel("pickaxe", 3);
+		setCreativeTab(Avaritia.tab);
+		setDefaultState(getDefaultState().withProperty(AvaritiaProps.HORIZONTAL_FACING, EnumFacing.NORTH).withProperty(AvaritiaProps.ACTIVE, false));
+	}
 
-    @Override
-    protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, AvaritiaProps.HORIZONTAL_FACING, AvaritiaProps.ACTIVE);
-    }
+	@Override
+	protected BlockStateContainer createBlockState() {
+		return new BlockStateContainer(this, AvaritiaProps.HORIZONTAL_FACING, AvaritiaProps.ACTIVE);
+	}
 
-    @Override
-    public int getMetaFromState(IBlockState state) {
-        return 0;
-    }
+	@Override
+	public int getMetaFromState(IBlockState state) {
+		return state.getValue(AvaritiaProps.ACTIVE) ? 1 : 0;
+	}
 
-    @Override
-    public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
-        TileEntity tileEntity = worldIn.getTileEntity(pos);
-        if (tileEntity instanceof TileNeutroniumCompressor) {
-            TileNeutroniumCompressor compressor = (TileNeutroniumCompressor) tileEntity;
-            state = state.withProperty(AvaritiaProps.HORIZONTAL_FACING, compressor.getFacing());
-            state = state.withProperty(AvaritiaProps.ACTIVE, true);//TODO Figure out active states.
-        }
-        return super.getActualState(state, worldIn, pos);
-    }
+	@Override
+	public IBlockState getStateFromMeta(int meta) {
+		return getDefaultState().withProperty(AvaritiaProps.ACTIVE, meta == 0 ? Boolean.valueOf(false) : Boolean.valueOf(true));
+	}
 
-    @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
-        if (world.isRemote) {
-            return true;
-        } else {
-            player.openGui(Avaritia.instance, 3, world, pos.getX(), pos.getY(), pos.getZ());
-            return true;
-        }
-    }
+	@Override
+	public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
+		return state.getValue(AvaritiaProps.ACTIVE) ? 9 : 0;
+	}
 
-    @Override
-    public TileEntity createNewTileEntity(World world, int meta) {
-        return new TileNeutroniumCompressor();
-    }
+	private TileNeutroniumCompressor getTE(World worldIn, BlockPos pos) {
+		if (worldIn.getTileEntity(pos) != null && worldIn.getTileEntity(pos) instanceof TileNeutroniumCompressor) {
+			return (TileNeutroniumCompressor) worldIn.getTileEntity(pos);
+		}
+		return null;
+	}
 
-    @Override
-    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase player, ItemStack stack) {
-        TileEntity tile = world.getTileEntity(pos);
-        if (tile instanceof TileNeutroniumCompressor) {
-            TileNeutroniumCompressor machine = (TileNeutroniumCompressor) tile;
-            machine.setFacing(RotationUtils.getPlacedRotationHorizontal(player));
-        }
+	@Override
+	public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighborBlock) {
+		if (world instanceof World) {
+			updatePowered((World) world, pos, world.getBlockState(pos));
+		}
+	}
 
-    }
+	@Override
+	public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {
+		updatePowered(world, pos, state);
+	}
 
-    @Override
-    public void breakBlock(World world, BlockPos pos, IBlockState state) {
-        TileNeutroniumCompressor compressor = (TileNeutroniumCompressor) world.getTileEntity(pos);
+	private void updatePowered(World world, BlockPos pos, IBlockState state) {
+		if (getTE(world, pos) == null || !(getTE(world, pos) instanceof TileNeutroniumCompressor)) {
+			return;
+		}
+		TileNeutroniumCompressor te = getTE(world, pos);
+		boolean running = te.getCompressionProgress() > 0;
+		if (running != world.getBlockState(pos).getValue(AvaritiaProps.ACTIVE)) {
+			world.setBlockState(pos, state.withProperty(AvaritiaProps.ACTIVE, Boolean.valueOf(running)), 2);
+		}
+	}
 
-        if (compressor != null) {
-            ItemUtils.dropInventory(world, pos, compressor);
-        }
+	@Override
+	public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
+		TileEntity tileEntity = worldIn.getTileEntity(pos);
+		if (tileEntity instanceof TileNeutroniumCompressor) {
+			TileNeutroniumCompressor compressor = (TileNeutroniumCompressor) tileEntity;
+			state = state.withProperty(AvaritiaProps.HORIZONTAL_FACING, compressor.getFacing());
+			state = state.withProperty(AvaritiaProps.ACTIVE, Boolean.valueOf(compressor.compression_progress > 0));
+		}
+		return super.getActualState(state, worldIn, pos);
+	}
 
-        super.breakBlock(world, pos, state);
-    }
+	@Override
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		if (world.isRemote) {
+			return true;
+		}
+		else {
+			player.openGui(Avaritia.instance, 3, world, pos.getX(), pos.getY(), pos.getZ());
+			return true;
+		}
+	}
 
-    @Override
-    public EnumBlockRenderType getRenderType(IBlockState state) {
-        return EnumBlockRenderType.MODEL;
-    }
+	@Override
+	public TileEntity createNewTileEntity(World world, int meta) {
+		return new TileNeutroniumCompressor();
+	}
 
-    @Override
-    @SideOnly (Side.CLIENT)
-    public void registerModels() {
-        ResourceLocation location = new ResourceLocation("avaritia:machine");
-        ModelLoader.setCustomStateMapper(this, new StateMapperBase() {
-            @Override
-            protected ModelResourceLocation getModelResourceLocation(IBlockState state) {
-                String modelLoc = "type=neutronium_compressor";
-                modelLoc += ",facing=" + state.getValue(AvaritiaProps.HORIZONTAL_FACING).getName();
-                modelLoc += ",active=" + state.getValue(AvaritiaProps.ACTIVE).toString().toLowerCase();
-                return new ModelResourceLocation(location, modelLoc);
-            }
-        });
-        ModelResourceLocation invLoc = new ModelResourceLocation(location, "type=neutronium_compressor,facing=north,active=true");
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, invLoc);
-        ModelLoader.setCustomMeshDefinition(Item.getItemFromBlock(this), stack -> invLoc);
-    }
+	@Override
+	public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase player, ItemStack stack) {
+		TileEntity tile = world.getTileEntity(pos);
+		if (tile instanceof TileNeutroniumCompressor) {
+			TileNeutroniumCompressor machine = (TileNeutroniumCompressor) tile;
+			machine.setFacing(RotationUtils.getPlacedRotationHorizontal(player));
+		}
+
+	}
+
+	@Override
+	public void breakBlock(World world, BlockPos pos, IBlockState state) {
+		TileNeutroniumCompressor compressor = (TileNeutroniumCompressor) world.getTileEntity(pos);
+
+		if (compressor != null) {
+			ItemUtils.dropInventory(world, pos, compressor);
+		}
+
+		super.breakBlock(world, pos, state);
+	}
+
+	@Override
+	public EnumBlockRenderType getRenderType(IBlockState state) {
+		return EnumBlockRenderType.MODEL;
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void registerModels() {
+		ResourceLocation location = new ResourceLocation("avaritia:machine");
+		ModelLoader.setCustomStateMapper(this, new StateMapperBase() {
+			@Override
+			protected ModelResourceLocation getModelResourceLocation(IBlockState state) {
+				String modelLoc = "type=neutronium_compressor";
+				modelLoc += ",facing=" + state.getValue(AvaritiaProps.HORIZONTAL_FACING).getName();
+				modelLoc += ",active=" + state.getValue(AvaritiaProps.ACTIVE).toString().toLowerCase();
+				return new ModelResourceLocation(location, modelLoc);
+			}
+		});
+		ModelResourceLocation invLoc = new ModelResourceLocation(location, "type=neutronium_compressor,facing=north,active=true");
+		ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, invLoc);
+		ModelLoader.setCustomMeshDefinition(Item.getItemFromBlock(this), stack -> invLoc);
+	}
 }

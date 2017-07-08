@@ -16,6 +16,7 @@ import morph.avaritia.init.ModBlocks;
 import morph.avaritia.init.ModItems;
 import morph.avaritia.init.Recipes;
 import morph.avaritia.util.CompressorBalanceCalculator;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -26,46 +27,45 @@ import net.minecraftforge.fml.common.registry.EntityRegistry;
 
 public class Proxy {
 
-    public void preInit(FMLPreInitializationEvent event) {
-        ConfigHandler.init(event.getSuggestedConfigurationFile());
-        ModItems.init();
-        ModBlocks.init();
-        NetworkRegistry.INSTANCE.registerGuiHandler(Avaritia.instance, new GUIHandler());
-        MinecraftForge.EVENT_BUS.register(new AbilityHandler());
-        MinecraftForge.EVENT_BUS.register(new AvaritiaEventHandler());
-        MinecraftForge.EVENT_BUS.register(new AchievementTrigger());
+	public void preInit(FMLPreInitializationEvent event) {
+		ConfigHandler.init(event.getSuggestedConfigurationFile());
+		ModItems.init();
+		ModBlocks.init();
+		NetworkRegistry.INSTANCE.registerGuiHandler(Avaritia.instance, new GUIHandler());
+		MinecraftForge.EVENT_BUS.register(new AbilityHandler());
+		MinecraftForge.EVENT_BUS.register(new AvaritiaEventHandler());
+		MinecraftForge.EVENT_BUS.register(new AchievementTrigger());
+		EntityRegistry.registerModEntity(new ResourceLocation(Avaritia.MOD_ID, "EndestPearl"), EntityEndestPearl.class, "EndestPearl", 1, Avaritia.instance, 64, 10, true);
+		EntityRegistry.registerModEntity(new ResourceLocation(Avaritia.MOD_ID, "GapingVoid"), EntityGapingVoid.class, "GapingVoid", 2, Avaritia.instance, 256, 10, false);
+		EntityRegistry.registerModEntity(new ResourceLocation(Avaritia.MOD_ID, "HeavenArrow"), EntityHeavenArrow.class, "HeavenArrow", 3, Avaritia.instance, 32, 1, true);
+		EntityRegistry.registerModEntity(new ResourceLocation(Avaritia.MOD_ID, "HeavenSubArrow"), EntityHeavenSubArrow.class, "HeavenSubArrow", 4, Avaritia.instance, 32, 2, true);
+	}
 
-        EntityRegistry.registerModEntity(EntityEndestPearl.class, "EndestPearl", 1, Avaritia.instance, 64, 10, true);
-        EntityRegistry.registerModEntity(EntityGapingVoid.class, "GapingVoid", 2, Avaritia.instance, 256, 10, false);
-        EntityRegistry.registerModEntity(EntityHeavenArrow.class, "HeavenArrow", 3, Avaritia.instance, 32, 1, true);
-        EntityRegistry.registerModEntity(EntityHeavenSubArrow.class, "HeavenSubArrow", 4, Avaritia.instance, 32, 2, true);
-    }
+	public void init(FMLInitializationEvent event) {
+		CompressorBalanceCalculator.gatherBalanceModifier();
+		FoodRecipes.initFoodRecipes();
+		Recipes.init();
+		Recipes.initRecipeCompat();
+	}
 
-    public void init(FMLInitializationEvent event) {
-        CompressorBalanceCalculator.gatherBalanceModifier();
-        FoodRecipes.initFoodRecipes();
-        Recipes.init();
-        Recipes.initRecipeCompat();
-    }
+	public void postInit(FMLPostInitializationEvent event) {
 
-    public void postInit(FMLPostInitializationEvent event) {
+	}
 
-    }
+	public void addModelRegister(IModelRegister register) {
 
-    public void addModelRegister(IModelRegister register) {
+	}
 
-    }
+	public boolean isClient() {
+		return false;
+	}
 
-    public boolean isClient() {
-        return false;
-    }
+	public boolean isServer() {
+		return true;
+	}
 
-    public boolean isServer() {
-        return true;
-    }
-
-    public World getClientWorld() {
-        return null;
-    }
+	public World getClientWorld() {
+		return null;
+	}
 
 }

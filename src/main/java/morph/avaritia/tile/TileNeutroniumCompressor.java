@@ -1,5 +1,10 @@
 package morph.avaritia.tile;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import com.google.common.collect.Lists;
+
 import codechicken.lib.packet.PacketCustom;
 import codechicken.lib.util.ItemUtils;
 import morph.avaritia.recipe.compressor.CompressorManager;
@@ -8,347 +13,387 @@ import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-import java.util.LinkedList;
-import java.util.List;
 
 public class TileNeutroniumCompressor extends TileMachineBase implements ISidedInventory {
 
-    //Number of ticks needed to consume an item.
-    public static int CONSUME_TICKS = 1;//TODO Config.
+	//Number of ticks needed to consume an item.
+	public static int CONSUME_TICKS = 1;//TODO Config.
 
-    //The consumption progress.
-    private int consumption_progress;
-    //The production progress.
-    private int compression_progress;
-    //What we are creating.
-    private ItemStack target_stack;
-    private int compression_target;
+	//The consumption progress.
+	private int consumption_progress;
+	//The production progress.
+	public int compression_progress;
+	//What we are creating.
+	private ItemStack target_stack;
+	private int compression_target;
 
-    private ItemStack input;
-    private ItemStack output;
+	private ItemStack input = ItemStack.EMPTY;
+	private ItemStack output = ItemStack.EMPTY;
+	private int ticksSinceLastCheck = 0;
+	private boolean is_running = false;
 
-    private List<ItemStack> c_InputItems;
+	private List<ItemStack> c_InputItems = Lists.newArrayList();
 
-    private static final int[] top = new int[] { 0 };
-    private static final int[] sides = new int[] { 1 };
+	private static final int[] top = new int[] {
+			0
+	};
+	private static final int[] sides = new int[] {
+			1
+	};
 
-    @Override
-    public void doWork() {
+	public void setRunning(boolean running) {
+		is_running = running;
+	}
 
-        boolean dirty = false;
+	public boolean isRunning() {
+		return is_running;
+	}
 
-        if (target_stack == null) {
-            fullContainerSync = true;
-            target_stack = CompressorManager.getOutput(input);
-            compression_target = CompressorManager.getPrice(target_stack);
-        }
+	@Override
+	public void doWork() {
 
-        consumption_progress++;
-        if (consumption_progress == CONSUME_TICKS) {
-            consumption_progress = 0;
+		boolean dirty = false;
 
-            input.stackSize--;
-            if (input.stackSize == 0) {
-                input = null;
-            }
+		if (target_stack.isEmpty()) {
+			fullContainerSync = true;
+			target_stack = CompressorManager.getOutput(input);
+			compression_target = CompressorManager.getPrice(target_stack);
+		}
 
-            compression_progress++;
-            dirty = true;
-        }
+		consumption_progress++;
+		if (consumption_progress == CONSUME_TICKS) {
+			consumption_progress = 0;
 
-        if (compression_progress >= compression_target) {
-            compression_progress = 0;
-            if (output == null) {
-                output = ItemUtils.copyStack(target_stack, 1);
-            } else {
-                output.stackSize++;
-            }
-            dirty = true;
-            target_stack = null;
-            fullContainerSync = true;
-        }
+			input.shrink(1);
+			if (input.getCount() == 0) {
+				input = null;
+			}
 
-        if (dirty) {
-            markDirty();
-        }
-    }
+			compression_progress++;
+			dirty = true;
+		}
 
-    @Override
-    protected void onWorkStopped() {
-        consumption_progress = 0;
-    }
+		if (compression_progress >= compression_target) {
+			compression_progress = 0;
+			if (output.isEmpty()) {
+				output = ItemUtils.copyStack(target_stack, 1);
+			}
+			else {
+				output.grow(1);
+			}
+			dirty = true;
+			target_stack = ItemStack.EMPTY;
+			fullContainerSync = true;
+		}
 
-    @Override
-    protected boolean canWork() {
-        return CompressorManager.isValidInputForOutput(input, target_stack) && (output == null || output.stackSize < Math.min(output.getMaxStackSize(), getInventoryStackLimit()));
-    }
+		if (dirty) {
+			markDirty();
+		}
+	}
 
-    @Override
-    public void writeGuiData(PacketCustom packet, boolean isFullSync) {
-        packet.writeVarInt(consumption_progress);
-        packet.writeVarInt(compression_progress);
+	@Override
+	protected void onWorkStopped() {
+		consumption_progress = 0;
+	}
 
-        if (isFullSync) {
-            packet.writeBoolean(target_stack != null);
-            if (target_stack != null) {
-                packet.writeVarInt(compression_target);
-                packet.writeItemStack(target_stack);
-            }
+	@Override
+	protected boolean canWork() {
+		input = input == null ? ItemStack.EMPTY : input;
+		target_stack = target_stack == null ? ItemStack.EMPTY : target_stack;
+		return (!input.isEmpty() && !target_stack.isEmpty()) || (CompressorManager.isValidInputForOutput(input, target_stack) && (output.isEmpty() || output.getCount() < Math.min(output.getMaxStackSize(), getInventoryStackLimit())));
+	}
 
-            List<ItemStack> inputs = CompressorManager.getInputs(target_stack);
+	@Override
+	public void writeGuiData(PacketCustom packet, boolean isFullSync) {
+		packet.writeVarInt(consumption_progress);
+		packet.writeVarInt(compression_progress);
 
-            packet.writeInt(inputs.size());
-            for (ItemStack input : inputs) {
-                packet.writeItemStack(input);
-            }
-        }
-    }
+		if (isFullSync) {
+			packet.writeBoolean(!target_stack.isEmpty());
+			if (!target_stack.isEmpty()) {
+				packet.writeVarInt(compression_target);
+				packet.writeItemStack(target_stack);
+			}
 
-    @Override
-    public void readGuiData(PacketCustom packet, boolean isFullSync) {
-        consumption_progress = packet.readVarInt();
-        compression_progress = packet.readVarInt();
-        if (isFullSync) {
-            if (packet.readBoolean()) {
-                compression_target = packet.readVarInt();
-                target_stack = packet.readItemStack();
-            } else {
-                target_stack = null;
-                compression_target = 0;
-            }
+			List<ItemStack> inputs = CompressorManager.getInputs(target_stack);
 
-            List<ItemStack> inputs = new LinkedList<>();
-            int items = packet.readInt();
-            for (int i = 0; i < items; i++) {
-                inputs.add(packet.readItemStack());
-            }
+			packet.writeInt(inputs.size());
+			for (ItemStack input : inputs) {
+				packet.writeItemStack(input);
+			}
+		}
+	}
 
-            c_InputItems = inputs;
-        }
-    }
+	@Override
+	public void readGuiData(PacketCustom packet, boolean isFullSync) {
+		consumption_progress = packet.readVarInt();
+		compression_progress = packet.readVarInt();
+		if (isFullSync) {
+			if (packet.readBoolean()) {
+				compression_target = packet.readVarInt();
+				target_stack = packet.readItemStack();
+			}
+			else {
+				target_stack = null;
+				compression_target = 0;
+			}
 
-    public int getCompressionProgress() {
-        return compression_progress;
-    }
+			List<ItemStack> inputs = new LinkedList<>();
+			int items = packet.readInt();
+			for (int i = 0; i < items; i++) {
+				ItemStack stack = packet.readItemStack();
+				inputs.add(stack == null ? ItemStack.EMPTY : stack);
+			}
 
-    public int getCompressionTarget() {
-        return compression_target;
-    }
+			c_InputItems = inputs;
+		}
+	}
 
-    public int getConsumptionProgress() {
-        return consumption_progress;
-    }
+	public int getCompressionProgress() {
+		return compression_progress;
+	}
 
-    public int getConsumptionTarget() {
-        return CONSUME_TICKS;
-    }
+	public int getCompressionTarget() {
+		return compression_target;
+	}
 
-    public ItemStack getTargetStack() {
-        return target_stack;
-    }
+	public int getConsumptionProgress() {
+		return consumption_progress;
+	}
 
-    @SideOnly(Side.CLIENT)
-    public List<ItemStack> getInputItems() {
-        return c_InputItems;
-    }
+	public int getConsumptionTarget() {
+		return CONSUME_TICKS;
+	}
 
-    @Override
-    public void readFromNBT(NBTTagCompound tag) {
-        super.readFromNBT(tag);
-        input = ItemStack.loadItemStackFromNBT(tag.getCompoundTag("input"));
-        output = ItemStack.loadItemStackFromNBT(tag.getCompoundTag("output"));
+	public ItemStack getTargetStack() {
+		return target_stack == null ? ItemStack.EMPTY : target_stack;
+	}
 
-        consumption_progress = tag.getInteger("consumption_progress");
-        compression_progress = tag.getInteger("compression_progress");
+	public List<ItemStack> getInputItems() {
+		for (int i = 0; i < c_InputItems.size(); i++) {
+			if (c_InputItems.get(i) == null) {
+				c_InputItems.set(i, ItemStack.EMPTY);
+			}
+		}
+		return c_InputItems;
+	}
 
-        target_stack = ItemStack.loadItemStackFromNBT(tag.getCompoundTag("target"));
-        //Calc compression target.
-        compression_target = CompressorManager.getPrice(target_stack);
-        fullContainerSync = true;
-    }
+	@Override
+	public void readFromNBT(NBTTagCompound tag) {
+		super.readFromNBT(tag);
+		input = new ItemStack(tag.getCompoundTag("input"));
+		if (input == null) {
+			input = ItemStack.EMPTY;
+		}
+		output = new ItemStack(tag.getCompoundTag("output"));
+		if (output == null) {
+			output = ItemStack.EMPTY;
+		}
 
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound tag) {
-        if (input != null) {
-            NBTTagCompound inputTag = new NBTTagCompound();
-            input.writeToNBT(inputTag);
-            tag.setTag("input", inputTag);
-        }
-        if (output != null) {
-            NBTTagCompound outputTag = new NBTTagCompound();
-            output.writeToNBT(outputTag);
-            tag.setTag("output", outputTag);
-        }
-        if (target_stack != null) {
-            NBTTagCompound targetTag = new NBTTagCompound();
-            target_stack.writeToNBT(targetTag);
-            tag.setTag("target", targetTag);
-        }
-        tag.setInteger("consumption_progress", consumption_progress);
-        tag.setInteger("compression_progress", compression_progress);
-        return super.writeToNBT(tag);
-    }
+		consumption_progress = tag.getInteger("consumption_progress");
+		compression_progress = tag.getInteger("compression_progress");
 
-    @Override
-    public int getSizeInventory() {
-        return 2;
-    }
+		target_stack = new ItemStack(tag.getCompoundTag("target"));
+		if (target_stack == null) {
+			target_stack = ItemStack.EMPTY;
+		}
+		//Calc compression target.
+		compression_target = CompressorManager.getPrice(target_stack);
+		fullContainerSync = true;
+	}
 
-    @Override
-    public ItemStack getStackInSlot(int slot) {
-        if (slot == 0) {
-            return input;
-        } else {
-            return output;
-        }
-    }
+	@Override
+	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
+		if (input != null) {
+			NBTTagCompound inputTag = new NBTTagCompound();
+			input.writeToNBT(inputTag);
+			tag.setTag("input", inputTag);
+		}
+		if (output != null) {
+			NBTTagCompound outputTag = new NBTTagCompound();
+			output.writeToNBT(outputTag);
+			tag.setTag("output", outputTag);
+		}
+		if (target_stack != null) {
+			NBTTagCompound targetTag = new NBTTagCompound();
+			target_stack.writeToNBT(targetTag);
+			tag.setTag("target", targetTag);
+		}
+		tag.setInteger("consumption_progress", consumption_progress);
+		tag.setInteger("compression_progress", compression_progress);
+		return super.writeToNBT(tag);
+	}
 
-    @Override
-    public ItemStack decrStackSize(int slot, int decrement) {
-        if (slot == 0) {
-            if (input == null) {
-                return null;
-            } else {
-                if (decrement < input.stackSize) {
-                    ItemStack take = input.splitStack(decrement);
-                    if (input.stackSize <= 0) {
-                        input = null;
-                    }
-                    return take;
-                } else {
-                    ItemStack take = input;
-                    input = null;
-                    return take;
-                }
-            }
-        } else if (slot == 1) {
-            if (output == null) {
-                return null;
-            } else {
-                if (decrement < output.stackSize) {
-                    ItemStack take = output.splitStack(decrement);
-                    if (output.stackSize <= 0) {
-                        output = null;
-                    }
-                    return take;
-                } else {
-                    ItemStack take = output;
-                    output = null;
-                    return take;
-                }
-            }
-        }
-        return null;
-    }
+	@Override
+	public int getSizeInventory() {
+		return 2;
+	}
 
-    @Override
-    public boolean isUseableByPlayer(EntityPlayer player) {
-        return worldObj.getTileEntity(getPos()) == this && player.getDistanceSq(getPos().getX() + 0.5D, getPos().getY() + 0.5D, getPos().getZ() + 0.5D) <= 64.0D;
-    }
+	@Override
+	public ItemStack getStackInSlot(int slot) {
+		if (slot == 0) {
+			return input == null ? ItemStack.EMPTY : input;
+		}
+		else {
+			return output == null ? ItemStack.EMPTY : output;
+		}
+	}
 
-    @Override
-    public boolean isItemValidForSlot(int slot, ItemStack stack) {
-        if (stack == null) {
-            return false;
-        }
-        if (slot == 0) {
-            if (target_stack == null) {
-                return true;
-            }
-            if (CompressorManager.getOutput(stack) == null) {
-                return false;
-            }
-            if (CompressorManager.getOutput(stack).isItemEqual(target_stack)) {
-                return true;
-            }
-        }
-        return false;
-    }
+	@Override
+	public ItemStack decrStackSize(int slot, int decrement) {
+		if (slot == 0) {
+			if (input.isEmpty()) {
+				return ItemStack.EMPTY;
+			}
+			else {
+				if (decrement < input.getCount()) {
+					ItemStack take = input.splitStack(decrement);
+					if (input.getCount() <= 0) {
+						input = ItemStack.EMPTY;
+					}
+					return take;
+				}
+				else {
+					ItemStack take = input;
+					input = ItemStack.EMPTY;
+					return take;
+				}
+			}
+		}
+		else if (slot == 1) {
+			if (output.isEmpty()) {
+				return ItemStack.EMPTY;
+			}
+			else {
+				if (decrement < output.getCount()) {
+					ItemStack take = output.splitStack(decrement);
+					if (output.getCount() <= 0) {
+						output = ItemStack.EMPTY;
+					}
+					return take;
+				}
+				else {
+					ItemStack take = output;
+					output = ItemStack.EMPTY;
+					return take;
+				}
+			}
+		}
+		return null;
+	}
 
-    @Override
-    public int getInventoryStackLimit() {
-        return 64;
-    }
+	@Override
+	public boolean isUsableByPlayer(EntityPlayer player) {
+		return world.getTileEntity(getPos()) == this && player.getDistanceSq(getPos().getX() + 0.5D, getPos().getY() + 0.5D, getPos().getZ() + 0.5D) <= 64.0D;
+	}
 
-    @Override
-    public void setInventorySlotContents(int slot, ItemStack stack) {
-        if (slot == 0) {
-            input = stack;
-        } else if (slot == 1) {
-            output = stack;
-        }
-    }
+	@Override
+	public boolean isItemValidForSlot(int slot, ItemStack stack) {
+		if (stack.isEmpty()) {
+			return false;
+		}
+		if (slot == 0) {
+			if (target_stack.isEmpty()) {
+				return true;
+			}
+			if (CompressorManager.getOutput(stack).isEmpty()) {
+				return false;
+			}
+			if (CompressorManager.getOutput(stack).isItemEqual(target_stack)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
-    /**
-     * Returns the name of the inventory
-     */
-    @Override
-    public String getName() {
-        return "container.neutronium_compressor";
-    }
+	@Override
+	public int getInventoryStackLimit() {
+		return 64;
+	}
 
-    /**
-     * Returns if the inventory is named
-     */
-    @Override
-    public boolean hasCustomName() {
-        return false;
-    }
+	@Override
+	public void setInventorySlotContents(int slot, ItemStack stack) {
+		if (slot == 0) {
+			input = stack;
+		}
+		else if (slot == 1) {
+			output = stack;
+		}
+	}
 
-    @Override
-    public int[] getSlotsForFace(EnumFacing side) {
-        if (side == EnumFacing.UP) {
-            return top;
-        } else {
-            return sides;
-        }
-    }
+	/**
+	 * Returns the name of the inventory
+	 */
+	@Override
+	public String getName() {
+		return "container.neutronium_compressor";
+	}
 
-    @Override
-    public boolean canInsertItem(int slot, ItemStack stack, EnumFacing side) {
-        return isItemValidForSlot(slot, stack);
-    }
+	/**
+	 * Returns if the inventory is named
+	 */
+	@Override
+	public boolean hasCustomName() {
+		return false;
+	}
 
-    @Override
-    public boolean canExtractItem(int slot, ItemStack stack, EnumFacing side) {
-        if (slot == 1 && side != EnumFacing.UP) {
-            return true;
-        }
-        return false;
-    }
+	@Override
+	public int[] getSlotsForFace(EnumFacing side) {
+		if (side == EnumFacing.UP) {
+			return top;
+		}
+		else {
+			return sides;
+		}
+	}
 
-    @Override
-    public ItemStack removeStackFromSlot(int index) {
-        return null;
-    }
+	@Override
+	public boolean canInsertItem(int slot, ItemStack stack, EnumFacing side) {
+		return isItemValidForSlot(slot, stack);
+	}
 
-    @Override
-    public void openInventory(EntityPlayer player) {
-    }
+	@Override
+	public boolean canExtractItem(int slot, ItemStack stack, EnumFacing side) {
+		if (slot == 1 && side != EnumFacing.UP) {
+			return true;
+		}
+		return false;
+	}
 
-    @Override
-    public void closeInventory(EntityPlayer player) {
-    }
+	@Override
+	public ItemStack removeStackFromSlot(int index) {
+		return null;
+	}
 
-    @Override
-    public int getField(int id) {
-        return 0;
-    }
+	@Override
+	public void openInventory(EntityPlayer player) {
+	}
 
-    @Override
-    public void setField(int id, int value) {
-    }
+	@Override
+	public void closeInventory(EntityPlayer player) {
+	}
 
-    @Override
-    public int getFieldCount() {
-        return 0;
-    }
+	@Override
+	public int getField(int id) {
+		return 0;
+	}
 
-    @Override
-    public void clear() {
-    }
+	@Override
+	public void setField(int id, int value) {
+	}
+
+	@Override
+	public int getFieldCount() {
+		return 0;
+	}
+
+	@Override
+	public void clear() {
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return getInputItems().size() == 0;
+	}
 
 }

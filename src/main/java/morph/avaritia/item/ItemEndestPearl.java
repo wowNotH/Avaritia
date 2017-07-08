@@ -27,72 +27,72 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemEndestPearl extends ItemEnderPearl implements IHaloRenderItem, IModelRegister {
 
-    public ItemEndestPearl() {
-        this.setUnlocalizedName("avaritia:endest_pearl");
-        this.setRegistryName("endest_pearl");
-        this.maxStackSize = 16;
-        this.setCreativeTab(Avaritia.tab);
-    }
+	public ItemEndestPearl() {
+		setUnlocalizedName("avaritia:endest_pearl");
+		this.setRegistryName("endest_pearl");
+		maxStackSize = 16;
+		setCreativeTab(Avaritia.tab);
+	}
 
-    @Override
-    public ActionResult<ItemStack> onItemRightClick(ItemStack stack, World world, EntityPlayer player, EnumHand hand) {
-        if (!player.capabilities.isCreativeMode) {
-            --stack.stackSize;
-        }
+	@Override
+	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+		if (!player.capabilities.isCreativeMode) {
+			player.getHeldItem(hand).shrink(1);
+		}
 
-        world.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_ENDERPEARL_THROW, SoundCategory.NEUTRAL, 0.5F, 0.4F / (itemRand.nextFloat() * 0.4F + 0.8F));
+		world.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_ENDERPEARL_THROW, SoundCategory.NEUTRAL, 0.5F, 0.4F / (itemRand.nextFloat() * 0.4F + 0.8F));
 
-        if (!world.isRemote) {
-            EntityEndestPearl pearl = new EntityEndestPearl(world, player);
-            pearl.setHeadingFromThrower(player, player.rotationPitch, player.rotationYaw, 0.0F, 1.5F, 1.0F);
-            world.spawnEntityInWorld(pearl);
-        }
+		if (!world.isRemote) {
+			EntityEndestPearl pearl = new EntityEndestPearl(world, player);
+			pearl.setHeadingFromThrower(player, player.rotationPitch, player.rotationYaw, 0.0F, 1.5F, 1.0F);
+			world.spawnEntity(pearl);
+		}
 
-        return new ActionResult<>(EnumActionResult.SUCCESS, stack);
-    }
+		return new ActionResult<>(EnumActionResult.SUCCESS, player.getHeldItem(hand));
+	}
 
-    @Override
-    public EnumRarity getRarity(ItemStack stack) {
-        return EnumRarity.RARE;
-    }
+	@Override
+	public EnumRarity getRarity(ItemStack stack) {
+		return EnumRarity.RARE;
+	}
 
-    @Override
-    @SideOnly (Side.CLIENT)
-    public boolean shouldDrawHalo(ItemStack stack) {
-        return true;
-    }
+	@Override
+	@SideOnly(Side.CLIENT)
+	public boolean shouldDrawHalo(ItemStack stack) {
+		return true;
+	}
 
-    @Override
-    @SideOnly (Side.CLIENT)
-    public TextureAtlasSprite getHaloTexture(ItemStack stack) {
-        return AvaritiaTextures.HALO;
-    }
+	@Override
+	@SideOnly(Side.CLIENT)
+	public TextureAtlasSprite getHaloTexture(ItemStack stack) {
+		return AvaritiaTextures.HALO;
+	}
 
-    @Override
-    @SideOnly (Side.CLIENT)
-    public int getHaloSize(ItemStack stack) {
-        return 4;
-    }
+	@Override
+	@SideOnly(Side.CLIENT)
+	public int getHaloSize(ItemStack stack) {
+		return 4;
+	}
 
-    @Override
-    @SideOnly (Side.CLIENT)
-    public boolean shouldDrawPulse(ItemStack stack) {
-        return true;
-    }
+	@Override
+	@SideOnly(Side.CLIENT)
+	public boolean shouldDrawPulse(ItemStack stack) {
+		return true;
+	}
 
-    @Override
-    @SideOnly (Side.CLIENT)
-    public int getHaloColour(ItemStack stack) {
-        return 0xFF000000;
-    }
+	@Override
+	@SideOnly(Side.CLIENT)
+	public int getHaloColour(ItemStack stack) {
+		return 0xFF000000;
+	}
 
-    @Override
-    @SideOnly (Side.CLIENT)
-    public void registerModels() {
-        ModelResourceLocation pearl = new ModelResourceLocation("avaritia:resource", "type=endest_pearl");
-        ModelLoader.registerItemVariants(this, pearl);
-        IBakedModel wrapped = new HaloRenderItem(TransformUtils.DEFAULT_ITEM, modelRegistry -> modelRegistry.getObject(pearl));
-        ModelRegistryHelper.register(pearl, wrapped);
-        ModelLoader.setCustomMeshDefinition(this, (ItemStack stack) -> pearl);
-    }
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void registerModels() {
+		ModelResourceLocation pearl = new ModelResourceLocation("avaritia:resource", "type=endest_pearl");
+		ModelLoader.registerItemVariants(this, pearl);
+		IBakedModel wrapped = new HaloRenderItem(TransformUtils.DEFAULT_ITEM, modelRegistry -> modelRegistry.getObject(pearl));
+		ModelRegistryHelper.register(pearl, wrapped);
+		ModelLoader.setCustomMeshDefinition(this, (ItemStack stack) -> pearl);
+	}
 }
