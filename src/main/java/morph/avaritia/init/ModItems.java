@@ -3,6 +3,7 @@ package morph.avaritia.init;
 import morph.avaritia.Avaritia;
 import morph.avaritia.api.registration.IModelRegister;
 import morph.avaritia.handler.ConfigHandler;
+import morph.avaritia.init.ModIntegration.Mods;
 import morph.avaritia.item.ItemArmorInfinity;
 import morph.avaritia.item.ItemEndestPearl;
 import morph.avaritia.item.ItemFracturedOre;
@@ -24,7 +25,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.util.EnumHelper;
-import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.common.registry.IForgeRegistryEntry;
 
@@ -101,7 +102,9 @@ public class ModItems {
 	public static void init() {
 
 		resource = register(new ItemResource(Avaritia.tab, "resource"));
-		resource.registerModels();
+		if (FMLCommonHandler.instance().getSide().isClient()) {
+			resource.registerModels();
+		}
 
 		//0
 		diamond_lattice = resource.registerItem("diamond_lattice");
@@ -125,8 +128,9 @@ public class ModItems {
 		}
 
 		singularity = register(new ItemSingularity(Avaritia.tab, "singularity"));
-		singularity.registerModels();
-
+		if (FMLCommonHandler.instance().getSide().isClient()) {
+			singularity.registerModels();
+		}
 		ironSingularity = singularity.registerItem("iron");
 		goldSingularity = singularity.registerItem("gold");
 		lapisSingularity = singularity.registerItem("lapis");
@@ -139,7 +143,7 @@ public class ModItems {
 		nickelSingularity = singularity.registerItem("nickel");
 		diamondSingularity = singularity.registerItem("diamond");
 		emeraldSingularity = singularity.registerItem("emerald");
-		if (Loader.isModLoaded("redstonearsenal")) {
+		if (Mods.RS.isLoaded()) {
 			FLUXED_SINGULARITY = singularity.registerItem("flux_singularity");
 		}
 

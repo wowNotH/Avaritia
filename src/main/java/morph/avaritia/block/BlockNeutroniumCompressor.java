@@ -25,8 +25,10 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.ChunkCache;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -84,25 +86,31 @@ public class BlockNeutroniumCompressor extends BlockContainer implements IModelR
 	}
 
 	private void updatePowered(World world, BlockPos pos, IBlockState state) {
-		if (getTE(world, pos) == null || !(getTE(world, pos) instanceof TileNeutroniumCompressor)) {
-			return;
-		}
-		TileNeutroniumCompressor te = getTE(world, pos);
-		boolean running = te.getCompressionProgress() > 0;
-		if (running != world.getBlockState(pos).getValue(AvaritiaProps.ACTIVE)) {
-			world.setBlockState(pos, state.withProperty(AvaritiaProps.ACTIVE, Boolean.valueOf(running)), 2);
+		if (getTE(world, pos) != null && (getTE(world, pos) instanceof TileNeutroniumCompressor)) {
+			TileNeutroniumCompressor te = getTE(world, pos);
+			boolean running = te.getCompressionProgress() > 0;
+			if (running != world.getBlockState(pos).getValue(AvaritiaProps.ACTIVE)) {
+				world.setBlockState(pos, state.withProperty(AvaritiaProps.ACTIVE, Boolean.valueOf(running)), 2);
+			}
 		}
 	}
 
 	@Override
-	public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
-		TileEntity tileEntity = worldIn.getTileEntity(pos);
-		if (tileEntity instanceof TileNeutroniumCompressor) {
-			TileNeutroniumCompressor compressor = (TileNeutroniumCompressor) tileEntity;
-			state = state.withProperty(AvaritiaProps.HORIZONTAL_FACING, compressor.getFacing());
-			state = state.withProperty(AvaritiaProps.ACTIVE, Boolean.valueOf(compressor.compression_progress > 0));
+	public IBlockState getActualState(IBlockState state, IBlockAccess blockAccessor, BlockPos pos) {
+		TileEntity te;
+		if (blockAccessor instanceof ChunkCache) {
+			te = ((ChunkCache) blockAccessor).getTileEntity(pos, Chunk.EnumCreateEntityType.CHECK);
 		}
-		return super.getActualState(state, worldIn, pos);
+		else {
+			te = blockAccessor.getTileEntity(pos);
+		}
+		if (!(te instanceof TileNeutroniumCompressor)) {
+			return getDefaultState();
+		}
+		TileNeutroniumCompressor compressor = (TileNeutroniumCompressor) te;
+		state = state.withProperty(AvaritiaProps.HORIZONTAL_FACING, compressor.getFacing());
+		boolean isActive = Boolean.valueOf(compressor.getInputItems().size() > 0);
+		return state.withProperty(AvaritiaProps.ACTIVE, isActive);
 	}
 
 	@Override

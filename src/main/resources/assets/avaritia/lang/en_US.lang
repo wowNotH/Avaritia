@@ -46,6 +46,7 @@ item.avaritia.comb.cosmic.name=Cosmic Comb
 item.avaritia_beesource.infinity_drop.name=Infinity Drop
 item.avaritia_beesource.dust.name=Dust
 item.extremely_primordial_pearl.name=Extremely Primordial Pearl
+item.avaritia:infinty_hoe.name=Infinty Hoe
 #
 # Blocks
 tile.avaritia:compressed_workbench.name=Compressed Crafting Table
