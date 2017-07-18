@@ -43,7 +43,7 @@ public class ExtremeShapelessRecipe implements IRecipe {
 			for (int j = 0; j < 9; ++j) {
 				ItemStack itemstack = matrix.getStackInRowAndColumn(j, i);
 
-				if (itemstack != null) {
+				if (!itemstack.isEmpty()) {
 					boolean flag = false;
 
 					for (ItemStack stack : inputCopy) {

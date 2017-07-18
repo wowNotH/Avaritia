@@ -8,13 +8,11 @@ import com.google.common.collect.Collections2;
 import morph.avaritia.Avaritia;
 import morph.avaritia.client.render.entity.ModelArmorInfinity;
 import morph.avaritia.init.ModItems;
-import morph.avaritia.util.ModHelper;
 import morph.avaritia.util.TextUtils;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.MobEffects;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.EnumRarity;
@@ -69,9 +67,9 @@ public class ItemArmorInfinity extends ItemArmor {
 				if (obj instanceof PotionEffect) {
 					Potion pot = ((PotionEffect) obj).getPotion();
 
-					if (pot.equals(MobEffects.MINING_FATIGUE) && ModHelper.isHoldingCleaver(player)) {
-						continue;
-					}
+					//if (pot.equals(MobEffects.MINING_FATIGUE) && ModHelper.isHoldingCleaver(player)) {
+					//	continue;
+					//}
 					player.removePotionEffect(pot);
 				}
 

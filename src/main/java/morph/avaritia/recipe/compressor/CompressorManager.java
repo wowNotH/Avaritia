@@ -48,7 +48,7 @@ public class CompressorManager {
 		if (!input.isEmpty()) {
 			for (CompressorRecipe recipe : recipes) {
 				if (recipe.isValidInput(input)) {
-					return recipe.getOutput() == null ? ItemStack.EMPTY : recipe.getOutput();
+					return recipe.getOutput();
 				}
 			}
 		}

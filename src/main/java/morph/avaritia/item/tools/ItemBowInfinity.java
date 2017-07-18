@@ -105,7 +105,7 @@ public class ItemBowInfinity extends Item implements ICosmicRenderItem, IModelRe
 		stack.damageItem(1, player);
 		world.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_ARROW_SHOOT, SoundCategory.NEUTRAL, 1.0F, 1.0F / (itemRand.nextFloat() * 0.4F + 1.2F) + f * 0.5F);
 
-		arrow.pickupStatus = PickupStatus.CREATIVE_ONLY;//TODO, Override arrow droping and such, so we can have null arrow.
+		arrow.pickupStatus = PickupStatus.ALLOWED;//TODO, Override arrow droping and such, so we can have null arrow.
 
 		if (!world.isRemote) {
 			world.spawnEntity(arrow);
@@ -139,45 +139,6 @@ public class ItemBowInfinity extends Item implements ICosmicRenderItem, IModelRe
 	public int getItemEnchantability() {
 		return 1;
 	}
-
-	//@Override
-	//@SideOnly (Side.CLIENT)
-	//public void registerIcons(IIconRegister ir) {
-	//    int pullframes = 3;
-	//    this.itemIcon = ir.registerIcon(this.getIconString() + "_standby");
-	//    this.idleMask = ir.registerIcon(this.getIconString() + "_standby_mask");
-	//    this.iconArray = new IIcon[pullframes];
-	//    this.maskArray = new IIcon[pullframes];
-	//    for (int i = 0; i < pullframes; ++i) {
-	//        this.iconArray[i] = ir.registerIcon(this.getIconString() + "_pulling_" + i);
-	//        this.maskArray[i] = ir.registerIcon(this.getIconString() + "_pulling_mask_" + i);
-	//    }
-	//}
-
-	//@Override
-	//@SideOnly (Side.CLIENT)
-	//public IIcon getIcon(ItemStack stack, int renderPass, EntityPlayer player, ItemStack usingItem, int useRemaining) {
-	//    if (usingItem != null) {
-	//        int max = stack.getMaxItemUseDuration();
-	//        int pull = max - useRemaining;
-	//        if (pull >= (max * 2) / 3.0) {
-	//            return this.iconArray[2];
-	//        }
-	//        if (pull > max / 3.0) {
-	//            return this.iconArray[1];
-	//        }
-	//        if (pull > 0) {
-	//            return this.iconArray[0];
-	//        }
-	//    }
-	//    return getIcon(stack, renderPass);
-	//}
-
-	//@Override
-	//@SideOnly (Side.CLIENT)
-	//public IIcon getIcon(ItemStack stack, int pass) {
-	//    return super.getIcon(stack, pass);
-	//}
 
 	@Override
 	@SideOnly(Side.CLIENT)

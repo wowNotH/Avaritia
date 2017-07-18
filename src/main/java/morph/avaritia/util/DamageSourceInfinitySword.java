@@ -10,24 +10,24 @@ import net.minecraft.util.text.TextComponentTranslation;
 
 public class DamageSourceInfinitySword extends EntityDamageSource {
 
-    public DamageSourceInfinitySword(Entity source) {
-        super("infinity", source);
-    }
+	public DamageSourceInfinitySword(Entity source) {
+		super("infinity", source);
+	}
 
-    @Override
-    public ITextComponent getDeathMessage(EntityLivingBase entity) {
-        ItemStack itemstack = this.damageSourceEntity instanceof EntityLivingBase ? ((EntityLivingBase) this.damageSourceEntity).getHeldItem(EnumHand.MAIN_HAND) : null;
-        String s = "death.attack.infinity";
-        int rando = entity.getEntityWorld().rand.nextInt(5);
-        if (rando != 0) {
-            s = s + "." + rando;
-        }
-        return new TextComponentTranslation(s, entity.getDisplayName(), itemstack.getDisplayName());
-    }
+	@Override
+	public ITextComponent getDeathMessage(EntityLivingBase entity) {
+		ItemStack itemstack = damageSourceEntity instanceof EntityLivingBase ? ((EntityLivingBase) damageSourceEntity).getHeldItem(EnumHand.MAIN_HAND) : ItemStack.EMPTY;
+		String s = "death.attack.infinity";
+		int rando = entity.getEntityWorld().rand.nextInt(5);
+		if (rando != 0) {
+			s = s + "." + rando;
+		}
+		return itemstack.isEmpty() ? null : new TextComponentTranslation(s, entity.getDisplayName(), itemstack.getDisplayName());
+	}
 
-    @Override
-    public boolean isDifficultyScaled() {
-        return false;
-    }
+	@Override
+	public boolean isDifficultyScaled() {
+		return false;
+	}
 
 }

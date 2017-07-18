@@ -38,7 +38,7 @@ import net.minecraftforge.oredict.OreDictionary;
 
 public class ExtremeShapelessOreRecipe implements IRecipe {
 
-	protected ItemStack output = null;
+	protected ItemStack output = ItemStack.EMPTY;
 	protected ArrayList<Object> input = new ArrayList<>();
 
 	public ExtremeShapelessOreRecipe(Block result, Object... recipe) {
@@ -113,7 +113,7 @@ public class ExtremeShapelessOreRecipe implements IRecipe {
 		for (int x = 0; x < var1.getSizeInventory(); x++) {
 			ItemStack slot = var1.getStackInSlot(x);
 
-			if (slot != null) {
+			if (!slot.isEmpty()) {
 				boolean inRecipe = false;
 
 				for (Object next : required) {

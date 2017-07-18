@@ -48,6 +48,9 @@ public class CosmicItemRender extends WrappedItemRenderer {
 
 	@Override
 	public void renderItem(ItemStack item, TransformType type) {
+		if (transformType == null) {
+			transformType = net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType.GUI;
+		}
 		processLightLevel();
 		if (transformType == TransformType.GUI) {
 			renderInventory(item, renderEntity);

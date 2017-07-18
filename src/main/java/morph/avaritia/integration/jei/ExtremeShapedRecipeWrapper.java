@@ -32,7 +32,7 @@ public class ExtremeShapedRecipeWrapper extends BlankRecipeWrapper {
 		ItemStack recipeOutput = recipe.getRecipeOutput();
 		try {
 			ingredients.setInputs(ItemStack.class, recipeItems);
-			if (recipeOutput != null) {
+			if (!recipeOutput.isEmpty()) {
 				ingredients.setOutput(ItemStack.class, recipeOutput);
 			}
 		}

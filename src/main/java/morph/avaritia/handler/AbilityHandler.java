@@ -40,7 +40,7 @@ public class AbilityHandler {
 
 	public static boolean isPlayerWearing(EntityLivingBase entity, EntityEquipmentSlot slot, Predicate<Item> predicate) {
 		ItemStack stack = entity.getItemStackFromSlot(slot);
-		return stack != null && predicate.test(stack.getItem());
+		return !stack.isEmpty() && predicate.test(stack.getItem());
 	}
 
 	@SubscribeEvent

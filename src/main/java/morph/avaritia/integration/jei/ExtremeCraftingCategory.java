@@ -14,6 +14,7 @@ import mezz.jei.api.recipe.BlankRecipeCategory;
 import mezz.jei.api.recipe.IRecipeWrapper;
 import mezz.jei.api.recipe.wrapper.ICustomCraftingRecipeWrapper;
 import mezz.jei.api.recipe.wrapper.IShapedCraftingRecipeWrapper;
+import morph.avaritia.Avaritia;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -87,6 +88,6 @@ public class ExtremeCraftingCategory extends BlankRecipeCategory<IRecipeWrapper>
 
 	@Override
 	public String getModName() {
-		return null;
+		return Avaritia.MOD_NAME;
 	}
 }

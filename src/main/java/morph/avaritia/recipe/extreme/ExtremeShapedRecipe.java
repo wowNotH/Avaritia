@@ -66,7 +66,7 @@ public class ExtremeShapedRecipe implements IRecipe {
 			for (int l = 0; l < 9; ++l) {
 				int i1 = k - x;
 				int j1 = l - y;
-				ItemStack itemstack = null;
+				ItemStack itemstack = ItemStack.EMPTY;
 
 				if (i1 >= 0 && j1 >= 0 && i1 < recipeWidth && j1 < recipeHeight) {
 					if (mirrored) {
@@ -79,8 +79,8 @@ public class ExtremeShapedRecipe implements IRecipe {
 
 				ItemStack itemstack1 = matrix.getStackInRowAndColumn(k, l);
 
-				if (itemstack1 != null || itemstack != null) {
-					if (itemstack1 == null && itemstack != null || itemstack1 != null && itemstack == null) {
+				if (itemstack1 != ItemStack.EMPTY || itemstack != ItemStack.EMPTY) {
+					if (itemstack1 == ItemStack.EMPTY && itemstack != ItemStack.EMPTY || itemstack1 != ItemStack.EMPTY && itemstack == ItemStack.EMPTY) {
 						return false;
 					}
 

@@ -42,7 +42,7 @@ public class CompressorWrapper extends BlankRecipeWrapper {
 		try {
 			List<List<ItemStack>> inputs = stackHelper.expandRecipeItemStackInputs(Arrays.asList(recipe.getInputs()));
 			ingredients.setInputLists(ItemStack.class, inputs);
-			if (recipeOutput != null) {
+			if (!recipeOutput.isEmpty()) {
 				ingredients.setOutput(ItemStack.class, recipeOutput);
 			}
 		}

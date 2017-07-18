@@ -26,7 +26,7 @@ public class ContainerNeutronCollector extends ContainerMachineBase<TileNeutronC
 
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer player, int slotNumber) {
-		ItemStack itemstack = null;
+		ItemStack itemstack = ItemStack.EMPTY;
 		Slot slot = inventorySlots.get(slotNumber);
 
 		if (slot != null && slot.getHasStack()) {
@@ -35,31 +35,30 @@ public class ContainerNeutronCollector extends ContainerMachineBase<TileNeutronC
 
 			if (slotNumber == 0) {
 				if (!mergeItemStack(itemstack1, 1, 37, true)) {
-					return null;
+					return ItemStack.EMPTY;
 				}
-
 				slot.onSlotChange(itemstack1, itemstack);
 			}
 			else {
 				if (slotNumber >= 1 && slotNumber < 28) {
 					if (!mergeItemStack(itemstack1, 28, 37, false)) {
-						return null;
+						return ItemStack.EMPTY;
 					}
 				}
 				else if (slotNumber >= 28 && slotNumber < 37 && !mergeItemStack(itemstack1, 1, 28, false)) {
-					return null;
+					return ItemStack.EMPTY;
 				}
 			}
 
 			if (itemstack1.getCount() == 0) {
-				slot.putStack(null);
+				slot.putStack(ItemStack.EMPTY);
 			}
 			else {
 				slot.onSlotChanged();
 			}
 
 			if (itemstack1.getCount() == itemstack.getCount()) {
-				return null;
+				return ItemStack.EMPTY;
 			}
 
 			slot.onTake(player, itemstack1);

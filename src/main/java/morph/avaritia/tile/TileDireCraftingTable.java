@@ -6,21 +6,22 @@ import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 
 public class TileDireCraftingTable extends TileBase implements ISidedInventory {
 
-	private ItemStack result;
-	private ItemStack[] matrix = new ItemStack[81];
+	private ItemStack result = ItemStack.EMPTY;
+	private NonNullList<ItemStack> matrix = NonNullList.<ItemStack>withSize(81, ItemStack.EMPTY);
 
 	@Override
 	public void readFromNBT(NBTTagCompound tag) {
 		super.readFromNBT(tag);
 		result = new ItemStack(tag.getCompoundTag("Result"));
-		for (int x = 0; x < matrix.length; x++) {
-			matrix[x] = new ItemStack(tag.getCompoundTag("Craft" + x));
+		for (int x = 0; x < matrix.size(); x++) {
+			matrix.set(x, new ItemStack(tag.getCompoundTag("Craft" + x)));
 		}
 	}
 
@@ -35,10 +36,10 @@ public class TileDireCraftingTable extends TileBase implements ISidedInventory {
 			tag.removeTag("Result");
 		}
 
-		for (int x = 0; x < matrix.length; x++) {
-			if (matrix[x] != null) {
+		for (int x = 0; x < matrix.size(); x++) {
+			if (!matrix.get(x).isEmpty()) {
 				NBTTagCompound craft = new NBTTagCompound();
-				matrix[x].writeToNBT(craft);
+				matrix.get(x).writeToNBT(craft);
 				tag.setTag("Craft" + x, craft);
 			}
 			else {
@@ -58,11 +59,11 @@ public class TileDireCraftingTable extends TileBase implements ISidedInventory {
 		if (slot == 0) {
 			return result;
 		}
-		else if (slot <= matrix.length) {
-			return matrix[slot - 1];
+		else if (slot <= matrix.size()) {
+			return matrix.get(slot - 1);
 		}
 		else {
-			return null;
+			return ItemStack.EMPTY;
 		}
 	}
 
@@ -70,35 +71,35 @@ public class TileDireCraftingTable extends TileBase implements ISidedInventory {
 	public ItemStack decrStackSize(int slot, int decrement) {
 
 		if (slot == 0) {
-			if (result != null) {
-				for (int x = 1; x <= matrix.length; x++) {
+			if (!result.isEmpty()) {
+				for (int x = 1; x <= matrix.size(); x++) {
 					decrStackSize(x, 1);
 				}
 				if (result.getCount() <= decrement) {
 					ItemStack craft = result;
-					result = null;
+					result = ItemStack.EMPTY;
 					return craft;
 				}
 				ItemStack split = result.splitStack(decrement);
 				if (result.getCount() <= 0) {
-					result = null;
+					result = ItemStack.EMPTY;
 				}
 				return split;
 			}
 			else {
-				return null;
+				return ItemStack.EMPTY;
 			}
 		}
-		else if (slot <= matrix.length) {
-			if (matrix[slot - 1] != null) {
-				if (matrix[slot - 1].getCount() <= decrement) {
-					ItemStack ingredient = matrix[slot - 1];
-					matrix[slot - 1] = null;
+		else if (slot <= matrix.size()) {
+			if (!matrix.get(slot - 1).isEmpty()) {
+				if (matrix.get(slot - 1).getCount() <= decrement) {
+					ItemStack ingredient = matrix.get(slot - 1);
+					matrix.set(slot - 1, ItemStack.EMPTY);
 					return ingredient;
 				}
-				ItemStack split = matrix[slot - 1].splitStack(decrement);
-				if (matrix[slot - 1].getCount() <= 0) {
-					matrix[slot - 1] = null;
+				ItemStack split = matrix.get(slot - 1).splitStack(decrement);
+				if (matrix.get(slot - 1).getCount() <= 0) {
+					matrix.set(slot - 1, ItemStack.EMPTY);
 				}
 				return split;
 			}
@@ -109,28 +110,28 @@ public class TileDireCraftingTable extends TileBase implements ISidedInventory {
 	@Override
 	public ItemStack removeStackFromSlot(int slot) {
 		if (slot == 0) {
-			if (result != null) {
-				for (int x = 1; x <= matrix.length; x++) {
+			if (!result.isEmpty()) {
+				for (int x = 1; x <= matrix.size(); x++) {
 					decrStackSize(x, 1);
 				}
 
 				ItemStack craft = result;
-				result = null;
+				result = ItemStack.EMPTY;
 				return craft;
 
 			}
 			else {
-				return null;
+				return ItemStack.EMPTY;
 			}
 		}
-		else if (slot <= matrix.length) {
-			if (matrix[slot - 1] != null) {
-				ItemStack ingredient = matrix[slot - 1];
-				matrix[slot - 1] = null;
+		else if (slot <= matrix.size()) {
+			if (!matrix.get(slot - 1).isEmpty()) {
+				ItemStack ingredient = matrix.get(slot - 1);
+				matrix.set(slot - 1, ItemStack.EMPTY);
 				return ingredient;
 			}
 		}
-		return null;
+		return ItemStack.EMPTY;
 	}
 
 	@Override
@@ -162,8 +163,8 @@ public class TileDireCraftingTable extends TileBase implements ISidedInventory {
 		if (slot == 0) {
 			result = stack;
 		}
-		else if (slot <= matrix.length) {
-			matrix[slot - 1] = stack;
+		else if (slot <= matrix.size()) {
+			matrix.set(slot - 1, stack);
 		}
 	}
 
@@ -217,15 +218,15 @@ public class TileDireCraftingTable extends TileBase implements ISidedInventory {
 	@Override
 	public void clear() {
 		result = null;
-		for (int x = 0; x < matrix.length; x++) {
-			matrix[x] = null;
+		for (int x = 0; x < matrix.size(); x++) {
+			matrix.set(x, ItemStack.EMPTY);
 		}
 	}
 
 	@Override
 	public boolean isEmpty() {
 		for (ItemStack element : matrix) {
-			if (element != null) {
+			if (!element.isEmpty()) {
 				return false;
 			}
 		}

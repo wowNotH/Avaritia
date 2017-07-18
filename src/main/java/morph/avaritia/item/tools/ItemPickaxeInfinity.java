@@ -82,29 +82,6 @@ public class ItemPickaxeInfinity extends ItemPickaxe {
 		return Math.max(super.getStrVsBlock(stack, state), 6.0F);
 	}
 
-	//@SideOnly (Side.CLIENT)
-	//public void registerIcons(IIconRegister ir) {
-	//    this.itemIcon = ir.registerIcon("avaritia:infinity_pickaxe");
-	//    hammer = ir.registerIcon("avaritia:infinity_hammer");
-	//}
-
-	//@Override
-	//public IIcon getIcon(ItemStack stack, int pass) {
-	//    NBTTagCompound tags = stack.getTagCompound();
-	//    if (tags != null) {
-	//        if (tags.getBoolean("hammer")) {
-	//            return hammer;
-	//        }
-	//    }
-	//    return itemIcon;
-	//}
-
-	//@SideOnly (Side.CLIENT)
-	//@Override
-	//public IIcon getIconIndex(ItemStack stack) {
-	//    return getIcon(stack, 0);
-	//}
-
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
 		if (player.isSneaking()) {

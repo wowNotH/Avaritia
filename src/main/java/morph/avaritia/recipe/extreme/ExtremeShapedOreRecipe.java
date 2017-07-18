@@ -22,7 +22,7 @@ public class ExtremeShapedOreRecipe implements IRecipe {
 	private static final int MAX_CRAFT_GRID_WIDTH = 9;
 	private static final int MAX_CRAFT_GRID_HEIGHT = 9;
 
-	private ItemStack output = null;
+	private ItemStack output = ItemStack.EMPTY;
 	private Object[] input = null;
 	public int width = 0;
 	public int height = 0;

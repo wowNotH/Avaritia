@@ -55,16 +55,12 @@ public abstract class ContainerMachineBase<T extends TileMachineBase> extends Co
 
 	@Override
 	public void detectAndSendChanges() {
-		//super.detectAndSendChanges();
 		for (int i = 0; i < inventorySlots.size(); ++i) {
-			ItemStack itemstack = inventorySlots.get(i).getStack();
-			ItemStack itemstack1 = inventoryItemStacks.get(i);
-			itemstack = itemstack == null ? ItemStack.EMPTY : itemstack;
-			itemstack1 = itemstack1 == null ? ItemStack.EMPTY : itemstack1;
+			ItemStack itemstack = inventorySlots.get(i).getStack() == null ? ItemStack.EMPTY : inventorySlots.get(i).getStack();
+			ItemStack itemstack1 = inventoryItemStacks.get(i) == null ? ItemStack.EMPTY : inventoryItemStacks.get(i);
 			if (!ItemStack.areItemStacksEqual(itemstack1, itemstack)) {
-				itemstack1 = itemstack.isEmpty() ? ItemStack.EMPTY : itemstack.copy();
+				itemstack1 = itemstack.copy();
 				inventoryItemStacks.set(i, itemstack1);
-
 				for (int j = 0; j < listeners.size(); ++j) {
 					listeners.get(j).sendSlotContents(this, i, itemstack1);
 				}
@@ -77,33 +73,7 @@ public abstract class ContainerMachineBase<T extends TileMachineBase> extends Co
 		}
 		machineTile.fullContainerSync = false;
 		isFirstPacket = false;
+		super.detectAndSendChanges();
 	}
-	/*
-		@Override
-		public void detectAndSendChanges() {
-			//super.detectAndSendChanges();
-	
-			for (int i = 0; i < inventorySlots.size(); ++i) {
-				ItemStack itemstack = inventorySlots.get(i).getStack();
-				ItemStack itemstack1 = inventoryItemStacks.get(i);
-	
-				if (itemstack != null && itemstack1 != null && !ItemStack.areItemStacksEqual(itemstack1, itemstack)) {
-					itemstack1 = itemstack.isEmpty() ? ItemStack.EMPTY : itemstack.copy();
-					inventoryItemStacks.set(i, itemstack1);
-	
-					for (int j = 0; j < listeners.size(); ++j) {
-						listeners.get(j).sendSlotContents(this, i, itemstack1);
-					}
-				}
-			}
-	
-			for (IContainerListener listener : listeners) {
-				if (listener instanceof EntityPlayer) {
-					//NetworkDispatcher.dispatchGuiChanges(((EntityPlayer) listener), machineTile, isFirstPacket | machineTile.fullContainerSync);
-				}
-			}
-			machineTile.fullContainerSync = false;
-			isFirstPacket = false;
-		}
-	*/
+
 }

@@ -37,7 +37,7 @@ public class ContainerNeutroniumCompressor extends ContainerMachineBase<TileNeut
 
 		for (int i = 0; i < inventorySlots.size(); ++i) {
 			ItemStack stack = inventorySlots.get(i).getStack();
-			nonnulllist.add(stack == null ? ItemStack.EMPTY : stack);
+			nonnulllist.add(stack);
 		}
 
 		return nonnulllist;
@@ -62,28 +62,27 @@ public class ContainerNeutroniumCompressor extends ContainerMachineBase<TileNeut
 
 			if (slotNumber == 1) {
 				if (!mergeItemStack(itemstack1, 2, 38, true)) {
-					return null;
+					return ItemStack.EMPTY;
 				}
-
 				slot.onSlotChange(itemstack1, itemstack);
 			}
 			else if (slotNumber != 0) {
 				if (!CompressorManager.getOutput(itemstack1).isEmpty()) {
 					if (!mergeItemStack(itemstack1, 0, 1, false)) {
-						return null;
+						return ItemStack.EMPTY;
 					}
 				}
 				else if (slotNumber >= 2 && slotNumber < 29) {
 					if (!mergeItemStack(itemstack1, 29, 38, false)) {
-						return null;
+						return ItemStack.EMPTY;
 					}
 				}
 				else if (slotNumber >= 29 && slotNumber < 38 && !mergeItemStack(itemstack1, 2, 29, false)) {
-					return null;
+					return ItemStack.EMPTY;
 				}
 			}
 			else if (!mergeItemStack(itemstack1, 2, 38, false)) {
-				return null;
+				return ItemStack.EMPTY;
 			}
 
 			if (itemstack1.getCount() == 0) {

@@ -12,7 +12,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
+        classpath "net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT"
     }
 }
 
@@ -63,6 +63,8 @@ repositories {
 
 dependencies {
     compile "codechicken:CodeChickenLib:${mc_version}-${ccl_version}:deobf"
+	//deobfProvided "mezz.jei:jei_${mc_version}:${jei_version}:api"
+	//runtime "mezz.jei:jei_${mc_version}:${jei_version}"
     deobfCompile "mezz.jei:jei_${mc_version}:+"
     //deobfCompile "com.wayoftime.bloodmagic:BloodMagic:${mc_version}-${blood_magic_version}"
     deobfCompile "slimeknights:TConstruct:${mc_version}-${tinkers_version}"

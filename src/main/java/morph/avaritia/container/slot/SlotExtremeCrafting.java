@@ -1,4 +1,4 @@
-package morph.avaritia.container;
+package morph.avaritia.container.slot;
 
 import javax.annotation.Nullable;
 

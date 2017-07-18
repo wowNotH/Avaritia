@@ -21,7 +21,6 @@ public class StaticFakeSlot extends FakeSlot {
 	@Nullable
 	@Override
 	public ItemStack getStack() {
-		ItemStack stack = stackSupplier.get();
-		return stack == null ? ItemStack.EMPTY : stack;
+		return stackSupplier.get();
 	}
 }

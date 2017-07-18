@@ -22,6 +22,6 @@ public class OutputSlot extends Slot {
 
 	@Override
 	public ItemStack getStack() {
-		return inventory.getStackInSlot(getSlotIndex()) == null ? ItemStack.EMPTY : inventory.getStackInSlot(getSlotIndex());
+		return inventory.getStackInSlot(getSlotIndex());
 	}
 }

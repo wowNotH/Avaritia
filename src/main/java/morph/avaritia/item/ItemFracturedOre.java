@@ -19,6 +19,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.NonNullList;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 
@@ -90,7 +91,7 @@ public class ItemFracturedOre extends Item {
 			if (name.startsWith("ore") && !name.startsWith("oreberry")) {
 				//Lumberjack.info("ORE: "+name);
 
-				List<ItemStack> ores = OreDictionary.getOres(name);
+				NonNullList<ItemStack> ores = OreDictionary.getOres(name);
 
 				for (ItemStack ore : ores) {
 					ItemStackWrapper compare = new ItemStackWrapper(ore);
@@ -118,7 +119,7 @@ public class ItemFracturedOre extends Item {
 				}
 
 				ItemStack smeltingResult = FurnaceRecipes.instance().getSmeltingResult(orestack);
-				if (smeltingResult != null) {
+				if (!smeltingResult.isEmpty()) {
 					float exp = FurnaceRecipes.instance().getSmeltingExperience(orestack);
 					GameRegistry.addSmelting(stack, smeltingResult, exp);
 				}

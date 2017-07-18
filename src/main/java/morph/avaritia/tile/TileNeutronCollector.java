@@ -13,7 +13,7 @@ public class TileNeutronCollector extends TileMachineBase implements IInventory 
 
 	public static final int PRODUCTION_TICKS = 7111;//TODO config.
 
-	private ItemStack neutrons;
+	private ItemStack neutrons = ItemStack.EMPTY;
 	private int progress;
 
 	@Override
@@ -39,7 +39,7 @@ public class TileNeutronCollector extends TileMachineBase implements IInventory 
 
 	@Override
 	protected boolean canWork() {
-		return neutrons == null || neutrons.getCount() < 64;
+		return neutrons.isEmpty() || neutrons.getCount() < 64;
 	}
 
 	public int getProgress() {
@@ -91,20 +91,20 @@ public class TileNeutronCollector extends TileMachineBase implements IInventory 
 
 	@Override
 	public ItemStack decrStackSize(int slot, int decrement) {
-		if (neutrons == null) {
-			return null;
+		if (neutrons.isEmpty()) {
+			return ItemStack.EMPTY;
 		}
 		else {
 			if (decrement < neutrons.getCount()) {
 				ItemStack take = neutrons.splitStack(decrement);
 				if (neutrons.getCount() <= 0) {
-					neutrons = null;
+					neutrons = ItemStack.EMPTY;
 				}
 				return take;
 			}
 			else {
 				ItemStack take = neutrons;
-				neutrons = null;
+				neutrons = ItemStack.EMPTY;
 				return take;
 			}
 		}
@@ -150,7 +150,7 @@ public class TileNeutronCollector extends TileMachineBase implements IInventory 
 
 	@Override
 	public ItemStack removeStackFromSlot(int slot) {
-		return null;
+		return ItemStack.EMPTY;
 	}
 
 	@Override

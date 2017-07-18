@@ -91,12 +91,11 @@ public class ModelArmorInfinity extends ModelBiped {
 		return this;
 	}
 
-	@SuppressWarnings("rawtypes")
 	public void rebuildWings() {
 
 		// remove the old items from the list so that the new ones don't just stack up
 		if (bipedBody.childModels == null) {
-			bipedBody.childModels = new ArrayList();
+			bipedBody.childModels = new ArrayList<ModelRenderer>();
 		}
 		if (bipedLeftWing != null) {
 			bipedBody.childModels.remove(bipedLeftWing);
@@ -229,10 +228,10 @@ public class ModelArmorInfinity extends ModelBiped {
 		ItemStack leg = entityLiving.getItemStackFromSlot(EntityEquipmentSlot.LEGS);
 		ItemStack foot = entityLiving.getItemStackFromSlot(EntityEquipmentSlot.FEET);
 
-		boolean hasHat = hat != null && hat.getItem() == ModItems.infinity_helmet; //&& !((ItemArmorInfinity) (ModItems.infinity_helmet)).hasPhantomInk(hat);
-		boolean hasChest = chest != null && chest.getItem() == ModItems.infinity_chestplate; // && !((ItemArmorInfinity) (ModItems.infinity_chestplate)).hasPhantomInk(chest);
-		boolean hasLeg = leg != null && leg.getItem() == ModItems.infinity_pants; // && !((ItemArmorInfinity) (ModItems.infinity_pants)).hasPhantomInk(leg);
-		boolean hasFoot = foot != null && foot.getItem() == ModItems.infinity_boots; // && !((ItemArmorInfinity) (ModItems.infinity_boots)).hasPhantomInk(foot);
+		boolean hasHat = !hat.isEmpty() && hat.getItem() == ModItems.infinity_helmet; //&& !((ItemArmorInfinity) (ModItems.infinity_helmet)).hasPhantomInk(hat);
+		boolean hasChest = !chest.isEmpty() && chest.getItem() == ModItems.infinity_chestplate; // && !((ItemArmorInfinity) (ModItems.infinity_chestplate)).hasPhantomInk(chest);
+		boolean hasLeg = !leg.isEmpty() && leg.getItem() == ModItems.infinity_pants; // && !((ItemArmorInfinity) (ModItems.infinity_pants)).hasPhantomInk(leg);
+		boolean hasFoot = !foot.isEmpty() && foot.getItem() == ModItems.infinity_boots; // && !((ItemArmorInfinity) (ModItems.infinity_boots)).hasPhantomInk(foot);
 
 		if (armorSlot == EntityEquipmentSlot.HEAD) {//TODO, Wot.
 			if (hasHat && hasChest && hasLeg && hasFoot) {
@@ -295,7 +294,7 @@ public class ModelArmorInfinity extends ModelBiped {
 
 			ItemStack main_hand = player.getHeldItem(EnumHand.MAIN_HAND);
 
-			if (main_hand != null) {
+			if (!main_hand.isEmpty()) {
 				rightArmPose = ArmPose.ITEM;
 				overlay.rightArmPose = ArmPose.ITEM;
 				invulnOverlay.rightArmPose = ArmPose.ITEM;
@@ -320,7 +319,7 @@ public class ModelArmorInfinity extends ModelBiped {
 			}
 
 			ItemStack off_hand = player.getHeldItem(EnumHand.OFF_HAND);
-			if (off_hand != null) {
+			if (!off_hand.isEmpty()) {
 				leftArmPose = ArmPose.ITEM;
 				overlay.leftArmPose = ArmPose.ITEM;
 				invulnOverlay.leftArmPose = ArmPose.ITEM;
@@ -354,10 +353,10 @@ public class ModelArmorInfinity extends ModelBiped {
 		invulnOverlay.setRotationAngles(f1, speed, ticks, headYaw, headPitch, f6, entity);
 		RenderManager manager = Minecraft.getMinecraft().getRenderManager();
 		if (manager.entityRenderMap.containsKey(entity.getClass())) {
-			Render r = manager.entityRenderMap.get(entity.getClass());
+			Render<? extends Entity> r = manager.entityRenderMap.get(entity.getClass());
 
 			if (r instanceof RenderBiped) {
-				ModelBiped m = (ModelBiped) ((RenderBiped) r).getMainModel();
+				ModelBiped m = (ModelBiped) ((RenderBiped<? extends Entity>) r).getMainModel();
 
 				copyBipedAngles(m, this);
 			}
@@ -438,7 +437,6 @@ public class ModelArmorInfinity extends ModelBiped {
 			this.expand = expand;
 		}
 
-		@SuppressWarnings("rawtypes")
 		public void rebuild(TextureAtlasSprite icon, TextureAtlasSprite wingicon) {
 			int ox = MathHelper.floor(icon.getMinU() * itempagewidth);
 			int oy = MathHelper.floor(icon.getMinV() * itempageheight);
@@ -478,7 +476,7 @@ public class ModelArmorInfinity extends ModelBiped {
 				int oyw = MathHelper.floor(wingicon.getMinV() * itempageheight);
 
 				if (bipedBody.childModels == null) {
-					bipedBody.childModels = new ArrayList();
+					bipedBody.childModels = new ArrayList<ModelRenderer>();
 				}
 				if (bipedLeftWing != null) {
 					bipedBody.childModels.remove(bipedLeftWing);
@@ -514,10 +512,10 @@ public class ModelArmorInfinity extends ModelBiped {
 			super.setRotationAngles(f1, f2, f3, f4, f5, f6, entity);
 			RenderManager manager = Minecraft.getMinecraft().getRenderManager();
 			if (manager.entityRenderMap.containsKey(entity.getClass())) {
-				Render r = manager.entityRenderMap.get(entity.getClass());
+				Render<? extends Entity> r = manager.entityRenderMap.get(entity.getClass());
 
 				if (r instanceof RenderBiped) {
-					ModelBiped m = (ModelBiped) ((RenderBiped) r).getMainModel();
+					ModelBiped m = (ModelBiped) ((RenderBiped<? extends Entity>) r).getMainModel();
 
 					copyBipedAngles(m, this);
 				}

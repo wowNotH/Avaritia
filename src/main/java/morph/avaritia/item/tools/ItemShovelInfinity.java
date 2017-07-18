@@ -61,28 +61,6 @@ public class ItemShovelInfinity extends ItemSpade {
 		return Math.max(super.getStrVsBlock(stack, state), 1.0F);
 	}
 
-	//@SideOnly(Side.CLIENT)
-	//public void registerIcons(IIconRegister ir) {
-	//    this.itemIcon = ir.registerIcon("avaritia:infinity_shovel");
-	//    destroyer = ir.registerIcon("avaritia:infinity_destroyer");
-	//}
-
-	//@Override
-	//public IIcon getIcon(ItemStack stack, int pass){
-	//    NBTTagCompound tags = stack.getTagCompound();
-	//    if(tags != null){
-	//        if(tags.getBoolean("destroyer"))
-	//            return destroyer;
-	//    }
-	//    return itemIcon;
-	//}
-
-	//@SideOnly(Side.CLIENT)
-	//@Override
-	//public IIcon getIconIndex(ItemStack stack){
-	//    return getIcon(stack, 0);
-	//}
-
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
 		if (player.isSneaking()) {

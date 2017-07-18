@@ -1,5 +1,6 @@
 package morph.avaritia.container;
 
+import morph.avaritia.container.slot.SlotExtremeCrafting;
 import morph.avaritia.init.ModBlocks;
 import morph.avaritia.recipe.extreme.ExtremeCraftingManager;
 import morph.avaritia.recipe.extreme.InventoryDireCraftResult;
@@ -60,16 +61,9 @@ public class ContainerExtremeCrafting extends Container {
 		for (int i = 0; i < inventorySlots.size(); ++i) {
 			ItemStack itemstack = inventorySlots.get(i).getStack();
 			ItemStack itemstack1 = inventoryItemStacks.get(i);
-			if (itemstack == null) {
-				itemstack = ItemStack.EMPTY;
-			}
-			if (itemstack1 == null) {
-				itemstack1 = ItemStack.EMPTY;
-			}
 			if (!ItemStack.areItemStacksEqual(itemstack1, itemstack)) {
-				itemstack1 = itemstack.isEmpty() ? ItemStack.EMPTY : itemstack.copy();
+				itemstack1 = itemstack.copy();
 				inventoryItemStacks.set(i, itemstack1);
-
 				for (int j = 0; j < listeners.size(); ++j) {
 					listeners.get(j).sendSlotContents(this, i, itemstack1);
 				}
@@ -83,11 +77,7 @@ public class ContainerExtremeCrafting extends Container {
 
 		for (int i = 0; i < inventorySlots.size(); ++i) {
 			ItemStack stack = inventorySlots.get(i).getStack();
-			if (stack == null) {
-				nonnulllist.add(ItemStack.EMPTY);
-				inventorySlots.get(i).putStack(ItemStack.EMPTY);
-			}
-			else {
+			if (!stack.isEmpty()) {
 				nonnulllist.add(stack);
 			}
 		}
@@ -118,16 +108,12 @@ public class ContainerExtremeCrafting extends Container {
 
 		if (slot != null && slot.getHasStack()) {
 			ItemStack itemstack1 = slot.getStack();
-			if (itemstack1 == null) {
-				itemstack1 = ItemStack.EMPTY;
-			}
 			itemstack = itemstack1.copy();
 
 			if (slotNumber == 0) {
 				if (!mergeItemStack(itemstack1, 82, 118, true)) {//83 start??
 					return ItemStack.EMPTY;
 				}
-
 				slot.onSlotChange(itemstack1, itemstack);
 			}
 			else if (slotNumber >= 82 && slotNumber < 109) {

@@ -58,7 +58,7 @@ public class ExtremeCraftingManager {
 
 		for (; i < recipe.length; i += 2) {
 			Character character = (Character) recipe[i];
-			ItemStack itemstack1 = null;
+			ItemStack itemstack1 = ItemStack.EMPTY;
 
 			if (recipe[i + 1] instanceof Item) {
 				itemstack1 = new ItemStack((Item) recipe[i + 1]);
@@ -129,15 +129,15 @@ public class ExtremeCraftingManager {
 
 	public ItemStack findMatchingRecipe(InventoryCrafting matrix, World world) {
 		int numFound = 0;
-		ItemStack firstStackFound = null;
-		ItemStack secondStackFound = null;
+		ItemStack firstStackFound = ItemStack.EMPTY;
+		ItemStack secondStackFound = ItemStack.EMPTY;
 		int j;
 
 		//Figure out how many items there are in the inventory, Stack 0 is the first item found and stack 1 is the second.
 		for (j = 0; j < matrix.getSizeInventory(); ++j) {
 			ItemStack inSlot = matrix.getStackInSlot(j);
 
-			if (inSlot != null) {
+			if (!inSlot.isEmpty()) {
 				if (numFound == 0) {
 					firstStackFound = inSlot;
 				}
@@ -173,7 +173,7 @@ public class ExtremeCraftingManager {
 				}
 			}
 
-			return null;
+			return ItemStack.EMPTY;
 		}
 	}
 
@@ -184,9 +184,11 @@ public class ExtremeCraftingManager {
 			}
 		}
 
-		NonNullList<ItemStack> aitemstack = NonNullList.create();//new ItemStack[craftMatrix.getSizeInventory()];
-		for (IRecipe recipe : recipes) {
-			aitemstack.add(recipe.getRecipeOutput());
+		NonNullList<ItemStack> aitemstack = NonNullList.withSize(craftMatrix.getSizeInventory(), ItemStack.EMPTY); //Now respects slot position
+		for (int i = 0; i < craftMatrix.getSizeInventory(); i++) {
+			if (!recipes.get(i).getRecipeOutput().isEmpty()) {
+				aitemstack.set(i, recipes.get(i).getRecipeOutput());
+			}
 		}
 		return aitemstack;
 	}
