@@ -93,9 +93,29 @@ processResources {
     rename '(.+_at.cfg)', 'META-INF/$1'
 }
 
+def commonManifest = {
+    attributes 'FMLAT': 'avaritia_at.cfg'
+}
+
 jar {
 	classifier = 'universal'
-	manifest {
-        attributes 'FMLAT': 'avaritia_at.cfg'
-    }
+	manifest commonManifest
+}
+
+task deobfJar(type: Jar) {
+    from sourceSets.main.output
+    classifier = 'deobf'
+    manifest commonManifest
+}
+
+task srcJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+    manifest commonManifest
+}
+
+// Tell the artifact system about our extra jars
+artifacts {
+    archives deobfJar
+    archives srcJar
 }
