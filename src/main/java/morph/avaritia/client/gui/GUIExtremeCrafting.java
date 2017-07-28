@@ -2,22 +2,23 @@ package morph.avaritia.client.gui;
 
 import codechicken.lib.texture.TextureUtils;
 import morph.avaritia.container.ContainerExtremeCrafting;
-import morph.avaritia.tile.TileDireCraftingTable;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 
+/**
+ * @author p455w0rd
+ *
+ */
 public class GUIExtremeCrafting extends GuiContainer {
 
 	private static final ResourceLocation GUI_TEX = new ResourceLocation("avaritia", "textures/gui/dire_crafting_gui.png");
 
-	public GUIExtremeCrafting(InventoryPlayer par1InventoryPlayer, World par2World, BlockPos pos, TileDireCraftingTable table) {
-		super(new ContainerExtremeCrafting(par1InventoryPlayer, par2World, pos, table));
+	public GUIExtremeCrafting(InventoryPlayer playerInv, ContainerExtremeCrafting container) {
+		super(container);
 		ySize = 256;
 		xSize = 238;
 	}

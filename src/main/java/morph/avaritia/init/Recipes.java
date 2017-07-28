@@ -1,7 +1,11 @@
 package morph.avaritia.init;
 
+import com.google.common.collect.Lists;
+
 import codechicken.lib.util.ItemUtils;
 import morph.avaritia.handler.ConfigHandler;
+import morph.avaritia.init.ModIntegration.Mods;
+import morph.avaritia.integration.rs.RedstoneArsenal;
 import morph.avaritia.recipe.compressor.CompressorManager;
 import morph.avaritia.recipe.extreme.ExtremeCraftingManager;
 import morph.avaritia.recipe.extreme.ExtremeShapelessOreRecipe;
@@ -9,10 +13,9 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.util.NonNullList;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
-import net.minecraftforge.oredict.ShapelessOreRecipe;
 
 /**
  * Created by covers1624 on 11/04/2017.
@@ -172,23 +175,30 @@ public class Recipes {
                 'X', ModItems.infinity_catalyst
         );
 
-        catalyst = ExtremeCraftingManager.getInstance().addShapelessOreRecipe(
-                ModItems.infinity_catalyst,
-                new ItemStack(Blocks.EMERALD_BLOCK, 1),
+        NonNullList<ItemStack> singularities = NonNullList.<ItemStack>create();
+
+        singularities.addAll(Lists.<ItemStack>newArrayList(
                 ModItems.diamond_lattice,
                 ModItems.crystal_matrix_ingot,
                 ModItems.neutron_pile,
                 ModItems.neutron_nugget,
                 ModItems.neutronium_ingot,
-                ModItems.ultimate_stew,
-                ModItems.cosmic_meatballs,
-                ModItems.endest_pearl,
+                new ItemStack(ModItems.ultimate_stew),
+                new ItemStack(ModItems.cosmic_meatballs),
+                new ItemStack(ModItems.endest_pearl),
                 ModItems.ironSingularity,
                 ModItems.goldSingularity,
                 ModItems.lapisSingularity,
                 ModItems.redstoneSingularity,
-                ModItems.quartzSingularity
-        );
+                ModItems.quartzSingularity,
+                ModItems.diamondSingularity,
+                ModItems.emeraldSingularity));
+
+        if (Mods.RS.isLoaded()) {
+        	RedstoneArsenal.addRSSingularityToList(singularities);
+        }
+
+        catalyst = ExtremeCraftingManager.getInstance().addShapelessOreRecipe(ModItems.infinity_catalyst, singularities.toArray());
 
         ItemStack result = new ItemStack(ModItems.infinity_pickaxe, 1);
         result.addEnchantment(Enchantments.FORTUNE, 10);
@@ -206,6 +216,21 @@ public class Recipes {
                 "    N    ",
                 'I', ModItems.infinity_ingot,
                 'C', new ItemStack(ModBlocks.resource, 1, 2),
+                'N', ModItems.neutronium_ingot
+        );
+
+        ExtremeCraftingManager.getInstance().addRecipe(
+                new ItemStack(ModItems.infinity_hoe),
+                "     N   ",
+                " IIIIII  ",
+                "IIIIIII  ",
+                "I    II  ",
+                "     N   ",
+                "     N   ",
+                "     N   ",
+                "     N   ",
+                "     N   ",
+                'I', ModItems.infinity_ingot,
                 'N', ModItems.neutronium_ingot
         );
 
@@ -356,6 +381,9 @@ public class Recipes {
         CompressorManager.addRecipe(ModItems.diamondSingularity, 300, new ItemStack(Blocks.DIAMOND_BLOCK, 1));
         CompressorManager.addRecipe(ModItems.emeraldSingularity, 200, new ItemStack(Blocks.EMERALD_BLOCK, 1));
         CompressorManager.addOreRecipe(ModItems.quartzSingularity, 200, "blockQuartz");
+        if (Mods.RS.isLoaded()) {
+        	RedstoneArsenal.addRecipes();
+        }
 
         if (ConfigHandler.endStone) {
             ExtremeCraftingManager.getInstance().addExtremeShapedOreRecipe(
@@ -417,14 +445,14 @@ public class Recipes {
 		//if (Compat.mfr) {
 		//    catalyst.getInput().add(OreDictionary.getOres("record"));
 		//} else {
-		catalyst.getInput().add(ModItems.record_fragment);
-		IRecipe smashysmashy;
+		//catalyst.getInput().add(ModItems.record_fragment);
+		//IRecipe smashysmashy;
 		//if (Compat.botan) {
 		//	smashysmashy = new ShapelessOreRecipe(new ItemStack(LudicrousItems.resource, 4, 7), "record");
 		//} else {
-		smashysmashy = new ShapelessOreRecipe(ItemUtils.copyStack(ModItems.record_fragment, 8), "record");
+		//smashysmashy = new ShapelessOreRecipe(ItemUtils.copyStack(ModItems.record_fragment, 8), "record");
 		//}
-		GameRegistry.addRecipe(smashysmashy);
+		//GameRegistry.addRecipe(smashysmashy);
 		//}
 
 		if (ConfigHandler.copper && !OreDictionary.getOres("blockCopper").isEmpty()) {

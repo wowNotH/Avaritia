@@ -8,7 +8,6 @@ import com.google.common.collect.Collections2;
 import morph.avaritia.Avaritia;
 import morph.avaritia.client.render.entity.ModelArmorInfinity;
 import morph.avaritia.init.ModItems;
-import morph.avaritia.util.TextUtils;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -20,7 +19,6 @@ import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.fml.relauncher.Side;
@@ -100,10 +98,10 @@ public class ItemArmorInfinity extends ItemArmor {
 
 	@Override
 	public void addInformation(ItemStack stack, EntityPlayer player, List<String> list, boolean par4) {
-		if (slot == EntityEquipmentSlot.FEET) {
-			list.add("");
-			list.add(TextFormatting.BLUE + "+" + TextFormatting.ITALIC + TextUtils.makeSANIC("SANIC") + TextFormatting.RESET + "" + TextFormatting.BLUE + "% Speed");
-		}
+		//if (slot == EntityEquipmentSlot.FEET) {
+		//	list.add("");
+		//	list.add(TextFormatting.BLUE + "+" + TextFormatting.ITALIC + TextUtils.makeSANIC("SANIC") + TextFormatting.RESET + "" + TextFormatting.BLUE + "% Speed");
+		//}
 		super.addInformation(stack, player, list, par4);
 	}
 

@@ -10,19 +10,19 @@ import net.minecraft.item.ItemStack;
 
 public class CompressorRecipe {
 
-	private ItemStack product;
+	private ItemStack product = ItemStack.EMPTY;
 	private int cost;
-	private ItemStack input;
+	private ItemStack input = ItemStack.EMPTY;
 	private boolean specific;
 
-	public CompressorRecipe(ItemStack output, int amount, @Nonnull ItemStack ingredient, boolean exact) {
+	public CompressorRecipe(@Nonnull ItemStack output, int amount, @Nonnull ItemStack ingredient, boolean exact) {
 		product = output;
 		cost = amount;
 		input = ingredient;
 		specific = exact;
 	}
 
-	public CompressorRecipe(ItemStack output, int amount, @Nonnull ItemStack ingredient) {
+	public CompressorRecipe(@Nonnull ItemStack output, int amount, @Nonnull ItemStack ingredient) {
 		this(output, amount, ingredient, false);
 	}
 

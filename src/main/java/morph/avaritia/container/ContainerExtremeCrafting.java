@@ -1,99 +1,77 @@
 package morph.avaritia.container;
 
-import morph.avaritia.container.slot.SlotExtremeCrafting;
 import morph.avaritia.init.ModBlocks;
 import morph.avaritia.recipe.extreme.ExtremeCraftingManager;
-import morph.avaritia.recipe.extreme.InventoryDireCraftResult;
-import morph.avaritia.recipe.extreme.InventoryDireCrafting;
-import morph.avaritia.tile.TileDireCraftingTable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryCraftResult;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.SlotCrafting;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+/**
+ * @author p455w0rd
+ *
+ */
 public class ContainerExtremeCrafting extends Container {
 
 	/**
 	 * The crafting matrix inventory (9x9).
 	 */
-	public InventoryCrafting craftMatrix;
-	public IInventory craftResult;
+	public InventoryCrafting craftMatrix = new InventoryCrafting(this, 9, 9);
+	public IInventory craftResult = new InventoryCraftResult();
 	protected World worldObj;
 	protected BlockPos pos;
 
-	public ContainerExtremeCrafting(InventoryPlayer player, World world, BlockPos pos, TileDireCraftingTable table) {
+	public ContainerExtremeCrafting(InventoryPlayer playerInv, World world, BlockPos pos) {
 		worldObj = world;
 		this.pos = pos;
-		craftMatrix = new InventoryDireCrafting(this, table);
-		craftResult = new InventoryDireCraftResult(table);
-		addSlotToContainer(new SlotExtremeCrafting(player.player, craftMatrix, craftResult, 0, 210, 80));
-		int wy;
-		int ex;
 
-		for (wy = 0; wy < 9; ++wy) {
-			for (ex = 0; ex < 9; ++ex) {
-				addSlotToContainer(new Slot(craftMatrix, ex + wy * 9, 12 + ex * 18, 8 + wy * 18));
+		addSlotToContainer(new SlotCrafting(playerInv.player, craftMatrix, craftResult, 0, 210, 80));
+
+		for (int y = 0; y < 9; ++y) {
+			for (int x = 0; x < 9; ++x) {
+				addSlotToContainer(new Slot(craftMatrix, x + y * 9, 12 + x * 18, 8 + y * 18));
 			}
 		}
 
-		for (wy = 0; wy < 3; ++wy) {
-			for (ex = 0; ex < 9; ++ex) {
-				addSlotToContainer(new Slot(player, ex + wy * 9 + 9, 39 + ex * 18, 174 + wy * 18));
+		for (int y = 0; y < 3; ++y) {
+			for (int x = 0; x < 9; ++x) {
+				addSlotToContainer(new Slot(playerInv, x + y * 9 + 9, 39 + x * 18, 174 + y * 18));
 			}
 		}
 
-		for (ex = 0; ex < 9; ++ex) {
-			addSlotToContainer(new Slot(player, ex, 39 + ex * 18, 232));
+		for (int x = 0; x < 9; ++x) {
+			addSlotToContainer(new Slot(playerInv, x, 39 + x * 18, 232));
 		}
 
-		onCraftMatrixChanged(craftMatrix);
 		getInventory();
-	}
-
-	@Override
-	public void detectAndSendChanges() {
-		for (int i = 0; i < inventorySlots.size(); ++i) {
-			ItemStack itemstack = inventorySlots.get(i).getStack();
-			ItemStack itemstack1 = inventoryItemStacks.get(i);
-			if (!ItemStack.areItemStacksEqual(itemstack1, itemstack)) {
-				itemstack1 = itemstack.copy();
-				inventoryItemStacks.set(i, itemstack1);
-				for (int j = 0; j < listeners.size(); ++j) {
-					listeners.get(j).sendSlotContents(this, i, itemstack1);
-				}
-			}
-		}
-	}
-
-	@Override
-	public NonNullList<ItemStack> getInventory() {
-		NonNullList<ItemStack> nonnulllist = NonNullList.<ItemStack>create();
-
-		for (int i = 0; i < inventorySlots.size(); ++i) {
-			ItemStack stack = inventorySlots.get(i).getStack();
-			if (!stack.isEmpty()) {
-				nonnulllist.add(stack);
-			}
-		}
-
-		return nonnulllist;
+		onCraftMatrixChanged(craftMatrix);
 	}
 
 	@Override
 	public void onCraftMatrixChanged(IInventory matrix) {
 		craftResult.setInventorySlotContents(0, ExtremeCraftingManager.getInstance().findMatchingRecipe(craftMatrix, worldObj));
+		detectAndSendChanges();
 	}
 
 	@Override
 	public void onContainerClosed(EntityPlayer player) {
 		super.onContainerClosed(player);
+		if (!worldObj.isRemote) {
+			for (int i = 0; i < 9; ++i) {
+				ItemStack itemstack = craftMatrix.removeStackFromSlot(i);
 
+				if (!itemstack.isEmpty()) {
+					player.dropItem(itemstack, false);
+				}
+			}
+		}
 	}
 
 	@Override
@@ -102,39 +80,38 @@ public class ContainerExtremeCrafting extends Container {
 	}
 
 	@Override
-	public ItemStack transferStackInSlot(EntityPlayer player, int slotNumber) {
+	public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
 		ItemStack itemstack = ItemStack.EMPTY;
-		Slot slot = inventorySlots.get(slotNumber);
+		Slot slot = inventorySlots.get(index);
 
 		if (slot != null && slot.getHasStack()) {
 			ItemStack itemstack1 = slot.getStack();
 			itemstack = itemstack1.copy();
 
-			if (slotNumber == 0) {
-				if (!mergeItemStack(itemstack1, 82, 118, true)) {//83 start??
+			if (index == 0) {
+				itemstack1.getItem().onCreated(itemstack1, worldObj, playerIn);
+
+				if (!mergeItemStack(itemstack1, 10, 46, true)) {
 					return ItemStack.EMPTY;
 				}
+
 				slot.onSlotChange(itemstack1, itemstack);
 			}
-			else if (slotNumber >= 82 && slotNumber < 109) {
-				if (!mergeItemStack(itemstack1, 109, 118, false)) {
-					if (!mergeItemStack(itemstack1, 1, 82, false)) {
-						return ItemStack.EMPTY;
-					}
-				}
-			}
-			else if (slotNumber >= 109 && slotNumber < 118) {
-				if (!mergeItemStack(itemstack1, 82, 109, false)) {
+			else if (index >= 10 && index < 37) {
+				if (!mergeItemStack(itemstack1, 37, 46, false)) {
 					return ItemStack.EMPTY;
 				}
 			}
-			else if (!mergeItemStack(itemstack1, 82, 118, false)) {
-				if (!mergeItemStack(itemstack1, 1, 82, false)) {
+			else if (index >= 37 && index < 46) {
+				if (!mergeItemStack(itemstack1, 10, 37, false)) {
 					return ItemStack.EMPTY;
 				}
+			}
+			else if (!mergeItemStack(itemstack1, 10, 46, false)) {
+				return ItemStack.EMPTY;
 			}
 
-			if (itemstack1.getCount() == 0) {
+			if (itemstack1.isEmpty()) {
 				slot.putStack(ItemStack.EMPTY);
 			}
 			else {
@@ -145,9 +122,13 @@ public class ContainerExtremeCrafting extends Container {
 				return ItemStack.EMPTY;
 			}
 
-			slot.onTake(player, itemstack1);
-		}
+			ItemStack itemstack2 = slot.onTake(playerIn, itemstack1);
 
+			if (index == 0) {
+				playerIn.dropItem(itemstack2, false);
+			}
+		}
+		detectAndSendChanges();
 		return itemstack;
 	}
 

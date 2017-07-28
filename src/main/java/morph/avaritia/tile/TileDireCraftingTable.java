@@ -27,7 +27,7 @@ public class TileDireCraftingTable extends TileBase implements ISidedInventory {
 
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
-		if (result != null) {
+		if (!result.isEmpty()) {
 			NBTTagCompound produce = new NBTTagCompound();
 			result.writeToNBT(produce);
 			tag.setTag("Result", produce);
@@ -188,7 +188,9 @@ public class TileDireCraftingTable extends TileBase implements ISidedInventory {
 
 	@Override
 	public int[] getSlotsForFace(EnumFacing face) {
-		return new int[] {};
+		return new int[] {
+				0
+		};
 	}
 
 	@Override
@@ -198,7 +200,7 @@ public class TileDireCraftingTable extends TileBase implements ISidedInventory {
 
 	@Override
 	public boolean canExtractItem(int slot, ItemStack item, EnumFacing face) {
-		return false;
+		return slot == 0;
 	}
 
 	@Override

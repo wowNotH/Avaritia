@@ -215,17 +215,53 @@ public class AvaritiaEventHandler {
 
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
-	public void onTooltip(ItemTooltipEvent event) {
+	public void onItemTooltip(ItemTooltipEvent event) {
+		String matchtext2 = I18n.translateToLocal("item.avaritia:infinity_sword.name").toLowerCase().trim();
+		if (event.getItemStack().getItem() instanceof ItemArmorInfinity) {
+			ItemArmorInfinity armor = (ItemArmorInfinity) event.getItemStack().getItem();
+			if (armor.getEquipmentSlot() == EntityEquipmentSlot.FEET) {
+				for (int x = 0; x < event.getToolTip().size(); x++) {
+					if (event.getToolTip().get(x).contains("Infinity Boots")) {
+						event.getToolTip().set(x, TextUtils.makeSANIC("Intinity Boots"));
+						continue;
+					}
+					if (event.getToolTip().get(x).contains("When on feet:")) {
+						event.getToolTip().add(x + 1, TextFormatting.BLUE + " +" + TextFormatting.ITALIC + TextUtils.makeSANIC("SANIC") + TextFormatting.RESET + "" + TextFormatting.BLUE + "% Speed");
+					}
+				}
+			}
+		}
 		if (event.getItemStack().getItem() instanceof ItemSwordInfinity) {
 			for (int x = 0; x < event.getToolTip().size(); x++) {
-				if (event.getToolTip().get(x).contains(I18n.translateToLocal("attribute.name.generic.attackDamage")) || event.getToolTip().get(x).contains(I18n.translateToLocal("Attack Damage"))) {
+
+				if (event.getToolTip().get(x).contains(I18n.translateToLocal("attribute.name.generic.attackDamage")) || event.getToolTip().get(x).contains("Attack Damage")) {
 					event.getToolTip().set(x, TextFormatting.BLUE + "+" + TextUtils.makeFabulous(I18n.translateToLocal("tip.infinity")) + " " + TextFormatting.BLUE + I18n.translateToLocal("attribute.name.generic.attackDamage"));
-					return;
+					continue;
 				}
+				else if (event.getToolTip().get(x).toLowerCase().trim().contains(matchtext2)) {
+					event.getToolTip().set(x, TextUtils.makeFabulous(I18n.translateToLocal("item.avaritia:infinity_sword.name")));
+				}
+
 			}
 		}
 	}
 
+	/*
+	@SideOnly(Side.CLIENT)
+	@SubscribeEvent
+	public void onTopoltipRender(RenderTooltipEvent.PostBackground event) {
+		for (int i = 0; i < event.getLines().size(); i++) {
+			String matchtext1 = I18n.translateToLocal("tip.infinity").toLowerCase().trim();
+			String matchtext2 = I18n.translateToLocal("item.avaritia:infinity_sword.name").toLowerCase().trim();
+			if (event.getLines().get(i).toLowerCase().trim().contains(matchtext1) && !event.getStack().isEmpty() && event.getStack().getItem() instanceof ItemSwordInfinity) {
+				event.getLines().set(i, TextUtils.makeFabulous(I18n.translateToLocal("tip.infinity")));
+			}
+			else if (event.getLines().get(i).toLowerCase().trim().contains(matchtext2)) {
+				event.getLines().set(i, TextUtils.makeFabulous(I18n.translateToLocal("item.avaritia:infinity_sword.name")));
+			}
+		}
+	}
+	*/
 	@SubscribeEvent
 	public void onGetHurt(LivingHurtEvent event) {
 		if (!(event.getEntityLiving() instanceof EntityPlayer)) {

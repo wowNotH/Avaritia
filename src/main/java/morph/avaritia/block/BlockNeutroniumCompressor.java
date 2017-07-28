@@ -3,7 +3,6 @@ package morph.avaritia.block;
 import java.util.Random;
 
 import codechicken.lib.util.ItemUtils;
-import codechicken.lib.util.RotationUtils;
 import morph.avaritia.Avaritia;
 import morph.avaritia.api.registration.IModelRegister;
 import morph.avaritia.init.AvaritiaProps;
@@ -76,7 +75,7 @@ public class BlockNeutroniumCompressor extends BlockContainer implements IModelR
 	@Override
 	public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighborBlock) {
 		if (world instanceof World) {
-			updatePowered((World) world, pos, world.getBlockState(pos));
+			//updatePowered((World) world, pos, world.getBlockState(pos));
 		}
 	}
 
@@ -86,11 +85,11 @@ public class BlockNeutroniumCompressor extends BlockContainer implements IModelR
 	}
 
 	private void updatePowered(World world, BlockPos pos, IBlockState state) {
-		if (getTE(world, pos) != null && (getTE(world, pos) instanceof TileNeutroniumCompressor)) {
+		if (!world.isRemote && getTE(world, pos) != null && (getTE(world, pos) instanceof TileNeutroniumCompressor)) {
 			TileNeutroniumCompressor te = getTE(world, pos);
-			boolean running = te.getCompressionProgress() > 0;
+			boolean running = te.getCompressionProgress() > 0 && !te.getStackInSlot(0).isEmpty();
 			if (running != world.getBlockState(pos).getValue(AvaritiaProps.ACTIVE)) {
-				world.setBlockState(pos, state.withProperty(AvaritiaProps.ACTIVE, Boolean.valueOf(running)), 2);
+				world.setBlockState(pos, state.withProperty(AvaritiaProps.ACTIVE, Boolean.valueOf(running)), 3);
 			}
 		}
 	}
@@ -105,12 +104,14 @@ public class BlockNeutroniumCompressor extends BlockContainer implements IModelR
 			te = blockAccessor.getTileEntity(pos);
 		}
 		if (!(te instanceof TileNeutroniumCompressor)) {
-			return getDefaultState();
+			return getDefaultState().withProperty(AvaritiaProps.ACTIVE, Boolean.valueOf(false));
 		}
-		TileNeutroniumCompressor compressor = (TileNeutroniumCompressor) te;
-		state = state.withProperty(AvaritiaProps.HORIZONTAL_FACING, compressor.getFacing());
-		boolean isActive = Boolean.valueOf(compressor.getInputItems().size() > 0);
-		return state.withProperty(AvaritiaProps.ACTIVE, isActive);
+		else {
+			TileNeutroniumCompressor compressor = (TileNeutroniumCompressor) te;
+			boolean running = compressor.getCompressionProgress() > 0 && !compressor.getStackInSlot(0).isEmpty();
+			state = state.withProperty(AvaritiaProps.HORIZONTAL_FACING, compressor.getFacing());
+			return state.withProperty(AvaritiaProps.ACTIVE, running);
+		}
 	}
 
 	@Override
@@ -132,9 +133,9 @@ public class BlockNeutroniumCompressor extends BlockContainer implements IModelR
 	@Override
 	public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase player, ItemStack stack) {
 		TileEntity tile = world.getTileEntity(pos);
-		if (tile instanceof TileNeutroniumCompressor) {
-			TileNeutroniumCompressor machine = (TileNeutroniumCompressor) tile;
-			machine.setFacing(RotationUtils.getPlacedRotationHorizontal(player));
+		if (tile != null && tile instanceof TileNeutroniumCompressor) {
+			TileNeutroniumCompressor machine = getTE(world, pos);
+			machine.setFacing(player.getHorizontalFacing().getOpposite());
 		}
 
 	}
@@ -168,7 +169,7 @@ public class BlockNeutroniumCompressor extends BlockContainer implements IModelR
 				return new ModelResourceLocation(location, modelLoc);
 			}
 		});
-		ModelResourceLocation invLoc = new ModelResourceLocation(location, "type=neutronium_compressor,facing=north,active=true");
+		ModelResourceLocation invLoc = new ModelResourceLocation(location, "type=neutronium_compressor,facing=north,active=false");
 		ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, invLoc);
 		ModelLoader.setCustomMeshDefinition(Item.getItemFromBlock(this), stack -> invLoc);
 	}

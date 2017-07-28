@@ -1,19 +1,11 @@
 package morph.avaritia.container.slot;
 
-import javax.annotation.Nullable;
-
 import morph.avaritia.recipe.extreme.ExtremeCraftingManager;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.Slot;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemHoe;
-import net.minecraft.item.ItemPickaxe;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemSword;
 import net.minecraft.util.NonNullList;
 
 /**
@@ -22,17 +14,17 @@ import net.minecraft.util.NonNullList;
 public class SlotExtremeCrafting extends Slot {
 
 	private final InventoryCrafting craftMatrix;
-	private final EntityPlayer thePlayer;
+	private final EntityPlayer player;
 	private int amountCrafted;
 
 	public SlotExtremeCrafting(EntityPlayer player, InventoryCrafting craftingInventory, IInventory inventoryIn, int slotIndex, int xPosition, int yPosition) {
 		super(inventoryIn, slotIndex, xPosition, yPosition);
-		thePlayer = player;
+		this.player = player;
 		craftMatrix = craftingInventory;
 	}
 
 	@Override
-	public boolean isItemValid(@Nullable ItemStack stack) {
+	public boolean isItemValid(ItemStack stack) {
 		return false;
 	}
 
@@ -52,65 +44,81 @@ public class SlotExtremeCrafting extends Slot {
 	}
 
 	@Override
-	protected void onCrafting(ItemStack stack) {
-		if (amountCrafted > 0) {
-			stack.onCrafting(thePlayer.world, thePlayer, amountCrafted);
-		}
-
-		amountCrafted = 0;
-
-		if (stack.getItem() == Item.getItemFromBlock(Blocks.CRAFTING_TABLE)) {
-			//thePlayer.addStat(AchievementList.BUILD_WORK_BENCH);
-		}
-
-		if (stack.getItem() instanceof ItemPickaxe) {
-			//thePlayer.addStat(AchievementList.BUILD_PICKAXE);
-		}
-
-		if (stack.getItem() == Item.getItemFromBlock(Blocks.FURNACE)) {
-			//thePlayer.addStat(AchievementList.BUILD_FURNACE);
-		}
-
-		if (stack.getItem() instanceof ItemHoe) {
-			//thePlayer.addStat(AchievementList.BUILD_HOE);
-		}
-
-		if (stack.getItem() == Items.BREAD) {
-			//thePlayer.addStat(AchievementList.MAKE_BREAD);
-		}
-
-		if (stack.getItem() == Items.CAKE) {
-			//thePlayer.addStat(AchievementList.BAKE_CAKE);
-		}
-
-		//if (stack.getItem() instanceof ItemPickaxe && ((ItemPickaxe) stack.getItem()).getToolMaterial() != Item.ToolMaterial.WOOD) {
-		//thePlayer.addStat(AchievementList.BUILD_BETTER_PICKAXE);
-		//}
-
-		if (stack.getItem() instanceof ItemSword) {
-			//thePlayer.addStat(AchievementList.BUILD_SWORD);
-		}
-
-		if (stack.getItem() == Item.getItemFromBlock(Blocks.ENCHANTING_TABLE)) {
-			//thePlayer.addStat(AchievementList.ENCHANTMENTS);
-		}
-
-		if (stack.getItem() == Item.getItemFromBlock(Blocks.BOOKSHELF)) {
-			//thePlayer.addStat(AchievementList.BOOKCASE);
-		}
+	protected void onSwapCraft(int amount) {
+		amountCrafted += amount;
 	}
 
 	@Override
-	public ItemStack onTake(EntityPlayer playerIn, ItemStack stack) {
-		net.minecraftforge.fml.common.FMLCommonHandler.instance().firePlayerCraftingEvent(playerIn, stack, craftMatrix);
+	protected void onCrafting(ItemStack stack) {
+		if (amountCrafted > 0) {
+			stack.onCrafting(player.world, player, amountCrafted);
+			net.minecraftforge.fml.common.FMLCommonHandler.instance().firePlayerCraftingEvent(player, stack, craftMatrix);
+		}
+
+		amountCrafted = 0;
+		/*
+		if (stack.getItem() == Item.getItemFromBlock(Blocks.CRAFTING_TABLE))
+		{
+		    this.player.addStat(AchievementList.BUILD_WORK_BENCH);
+		}
+
+		if (stack.getItem() instanceof ItemPickaxe)
+		{
+		    this.player.addStat(AchievementList.BUILD_PICKAXE);
+		}
+
+		if (stack.getItem() == Item.getItemFromBlock(Blocks.FURNACE))
+		{
+		    this.player.addStat(AchievementList.BUILD_FURNACE);
+		}
+
+		if (stack.getItem() instanceof ItemHoe)
+		{
+		    this.player.addStat(AchievementList.BUILD_HOE);
+		}
+
+		if (stack.getItem() == Items.BREAD)
+		{
+		    this.player.addStat(AchievementList.MAKE_BREAD);
+		}
+
+		if (stack.getItem() == Items.CAKE)
+		{
+		    this.player.addStat(AchievementList.BAKE_CAKE);
+		}
+
+		if (stack.getItem() instanceof ItemPickaxe && ((ItemPickaxe)stack.getItem()).getToolMaterial() != Item.ToolMaterial.WOOD)
+		{
+		    this.player.addStat(AchievementList.BUILD_BETTER_PICKAXE);
+		}
+
+		if (stack.getItem() instanceof ItemSword)
+		{
+		    this.player.addStat(AchievementList.BUILD_SWORD);
+		}
+
+		if (stack.getItem() == Item.getItemFromBlock(Blocks.ENCHANTING_TABLE))
+		{
+		    this.player.addStat(AchievementList.ENCHANTMENTS);
+		}
+
+		if (stack.getItem() == Item.getItemFromBlock(Blocks.BOOKSHELF))
+		{
+		    this.player.addStat(AchievementList.BOOKCASE);
+		}
+		*/
+	}
+
+	@Override
+	public ItemStack onTake(EntityPlayer thePlayer, ItemStack stack) {
 		this.onCrafting(stack);
-		net.minecraftforge.common.ForgeHooks.setCraftingPlayer(playerIn);
-		NonNullList<ItemStack> aitemstack = ExtremeCraftingManager.getInstance().getRemainingItems(craftMatrix, playerIn.world);
+		net.minecraftforge.common.ForgeHooks.setCraftingPlayer(thePlayer);
+		NonNullList<ItemStack> nonnulllist = ExtremeCraftingManager.getInstance().getRemainingItems(craftMatrix, thePlayer.world);
 		net.minecraftforge.common.ForgeHooks.setCraftingPlayer(null);
 
-		for (int i = 0; i < aitemstack.size(); ++i) {
+		for (int i = 0; i < nonnulllist.size(); ++i) {
 			ItemStack itemstack = craftMatrix.getStackInSlot(i);
-			ItemStack itemstack1 = aitemstack.get(i);
+			ItemStack itemstack1 = nonnulllist.get(i);
 
 			if (!itemstack.isEmpty()) {
 				craftMatrix.decrStackSize(i, 1);
@@ -125,11 +133,12 @@ public class SlotExtremeCrafting extends Slot {
 					itemstack1.grow(itemstack.getCount());
 					craftMatrix.setInventorySlotContents(i, itemstack1);
 				}
-				else if (!thePlayer.inventory.addItemStackToInventory(itemstack1)) {
-					thePlayer.dropItem(itemstack1, false);
+				else if (!player.inventory.addItemStackToInventory(itemstack1)) {
+					player.dropItem(itemstack1, false);
 				}
 			}
 		}
-		return ItemStack.EMPTY;
+
+		return stack;
 	}
 }

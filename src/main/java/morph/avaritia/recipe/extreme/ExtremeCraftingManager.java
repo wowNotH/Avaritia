@@ -87,6 +87,7 @@ public class ExtremeCraftingManager {
 		}
 
 		ExtremeShapedRecipe shapedrecipes = new ExtremeShapedRecipe(width, height, ingredients, result);
+		//ShapedRecipes shapedrecipes = new ShapedRecipes(width, height, ingredients, result);
 		recipes.add(shapedrecipes);
 		return shapedrecipes;
 	}
@@ -161,7 +162,6 @@ public class ExtremeCraftingManager {
 			if (i1 < 0) {
 				i1 = 0;
 			}
-
 			return new ItemStack(firstStackFound.getItem(), 1, i1);
 		}
 		else {

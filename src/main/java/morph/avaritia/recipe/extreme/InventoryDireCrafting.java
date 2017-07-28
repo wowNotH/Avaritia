@@ -18,7 +18,7 @@ public class InventoryDireCrafting extends InventoryCrafting {
 
 	@Override
 	public ItemStack getStackInSlot(int slot) {
-		return slot >= getSizeInventory() ? ItemStack.EMPTY : craft.getStackInSlot(slot + 1) == null ? ItemStack.EMPTY : craft.getStackInSlot(slot + 1);
+		return slot >= getSizeInventory() ? ItemStack.EMPTY : craft.getStackInSlot(slot);
 	}
 
 	@Override
@@ -34,19 +34,20 @@ public class InventoryDireCrafting extends InventoryCrafting {
 
 	@Override
 	public ItemStack decrStackSize(int slot, int decrement) {
-		ItemStack stack = craft.getStackInSlot(slot + 1);
-		if (stack != null) {
+
+		ItemStack stack = craft.getStackInSlot(slot);
+		if (!stack.isEmpty()) {
 			ItemStack itemstack;
 			if (stack.getCount() <= decrement) {
 				itemstack = stack.copy();
-				craft.setInventorySlotContents(slot + 1, ItemStack.EMPTY);
+				craft.setInventorySlotContents(slot, ItemStack.EMPTY);
 				container.onCraftMatrixChanged(this);
 				return itemstack;
 			}
 			else {
 				itemstack = stack.splitStack(decrement);
 				if (stack.getCount() == 0) {
-					craft.setInventorySlotContents(slot + 1, ItemStack.EMPTY);
+					craft.setInventorySlotContents(slot, ItemStack.EMPTY);
 				}
 				container.onCraftMatrixChanged(this);
 				return itemstack;
@@ -59,7 +60,7 @@ public class InventoryDireCrafting extends InventoryCrafting {
 
 	@Override
 	public void setInventorySlotContents(int slot, ItemStack itemstack) {
-		craft.setInventorySlotContents(slot + 1, itemstack);
+		craft.setInventorySlotContents(slot, itemstack);
 		container.onCraftMatrixChanged(this);
 	}
 

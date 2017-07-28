@@ -34,13 +34,17 @@ public class CompressorWrapper extends BlankRecipeWrapper {
 		}
 	}
 
+	public int getCost() {
+		return recipe != null ? recipe.getCost() : 0;
+	}
+
 	@Override
 	public void getIngredients(IIngredients ingredients) {
 		IStackHelper stackHelper = jeiHelpers.getStackHelper();
 		ItemStack recipeOutput = recipe.getOutput();
 
 		try {
-			List<List<ItemStack>> inputs = stackHelper.expandRecipeItemStackInputs(Arrays.asList(recipe.getInputs()));
+			List<List<ItemStack>> inputs = stackHelper.expandRecipeItemStackInputs(recipe.getInputs());
 			ingredients.setInputLists(ItemStack.class, inputs);
 			if (!recipeOutput.isEmpty()) {
 				ingredients.setOutput(ItemStack.class, recipeOutput);

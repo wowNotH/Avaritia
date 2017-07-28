@@ -59,21 +59,27 @@ repositories {
 		name 'McJtyLib'
         url "http://maven.k-4u.nl"
     }
+	maven {
+		name 'covers'
+        url "http://maven.covers1624.net"
+    }
 }
 
+// note to covers:
+// Keep these deobf deps. Using the compiled deobf jars from maven requires EVERYTHING to use the same mappings
+// Using the deobfCompiled versions of the universal jars deobfuscates the jars to match the mappings specified in gradle.properties
 dependencies {
-    compile "codechicken:CodeChickenLib:${mc_version}-${ccl_version}:deobf"
-	//deobfProvided "mezz.jei:jei_${mc_version}:${jei_version}:api"
+    deobfCompile "codechicken:CodeChickenLib:${mc_version}-${ccl_version}:universal"
+	//deobfProvided "mezz.jei:jei_${mc_version}:${jei_version}:api" - mezz told me to do this shit..but then JEI doesn't work indev so i dunno
 	//runtime "mezz.jei:jei_${mc_version}:${jei_version}"
     deobfCompile "mezz.jei:jei_${mc_version}:+"
-    //deobfCompile "com.wayoftime.bloodmagic:BloodMagic:${mc_version}-${blood_magic_version}"
     deobfCompile "slimeknights:TConstruct:${mc_version}-${tinkers_version}"
     deobfCompile "slimeknights.mantle:Mantle:${mc_version}-${mantle_version}"
     deobfCompile "mcjty.theoneprobe:TheOneProbe:1.1x-${top_version}"
 	deobfCompile "com.github.mcjty:compatlayer:${mc_version}-${compatlayer_version}"
-    //deobfCompile "net.sengir.forestry:forestry_${mc_version}:${forestry_version}"
     deobfCompile "MineTweaker3:MineTweaker3-API:${minetweaker_version}"
-    //compile "com.brandon3055.draconicevolution:Draconic-Evolution:${mc_version}-${de_version}:deobf"
+	deobfCompile "cofh:RedstoneArsenal:${mc_version}-${ra_version}:universal"
+	deobfCompile "cofh:CoFHCore:${mc_version}-${cofh_core_version}:universal"
 }
 
 processResources {
