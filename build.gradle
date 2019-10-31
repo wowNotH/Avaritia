@@ -8,18 +8,15 @@ buildscript {
         }
         maven {
             name = "sonatype"
-            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+            url = "https://oss.sonatype.org/content/groups/public"
         }
     }
     dependencies {
-        classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
     }
 }
-apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'idea'
 apply plugin: 'maven'
-
-
-
 
 group = "morph.avaritia" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "Avaritia"
@@ -76,7 +73,8 @@ println config.mc_version + "-" + config.forge_version
 // Setup the forge minecraft plugin data. Specify the preferred forge/minecraft version here
 minecraft {
     version = config.mc_version + "-" + config.forge_version
-    mappings = config.mappings
+    mcp_mappings_channel = config.mappings_channel
+	mcp_mappings_version = config.mappings_version
 	replace '${mod_version}', project.config.mod_version
     runDir = "run"
     makeObfSourceJar = false
