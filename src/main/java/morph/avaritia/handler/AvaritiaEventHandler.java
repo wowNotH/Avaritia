@@ -45,7 +45,7 @@ import net.minecraftforge.oredict.OreDictionary;
 import java.util.*;
 
 public class AvaritiaEventHandler {
-
+    private static Random randy = new Random();
     private static Map<Integer, List<AEOCrawlerTask>> crawlerTasks = new HashMap<>();
 
     private static Set<ItemStack> capturedDrops = new LinkedHashSet<>();
@@ -140,6 +140,10 @@ public class AvaritiaEventHandler {
             if (event.getItemStack().getTagCompound() != null && event.getItemStack().getTagCompound().getBoolean("hammer")) {
                 ModItems.infinity_pickaxe.onBlockStartBreak(event.getEntityPlayer().getHeldItem(EnumHand.MAIN_HAND), event.getPos(), event.getEntityPlayer());
             } else {//TODO, FIXME, HELP!
+                if (block.quantityDropped(randy) == 0) {
+                    world.destroyBlock(pos, true);
+                    event.getEntityPlayer().playSound(block.getSoundType().getBreakSound(), 1, 1);
+                }
                 //if (block.quantityDropped(randy) == 0) {
                 //    ItemStack drop = block.getPickBlock(state, ToolHelper.raytraceFromEntity(event.getWorld(), event.getEntityPlayer(), true, 10), event.getWorld(), event.getPos(), event.getEntityPlayer());
                 //    if (drop == null) {
